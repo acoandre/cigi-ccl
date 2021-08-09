@@ -57,7 +57,10 @@
  *  05/15/2008 Greg Basler                       Version 2.2.0
  *  Changed the Component class Conversion table sizing to a unified
  *   constant.
- *  
+ *
+ *  12/14/2018 Paul Slade                       Version 4.0.2
+ *  Fixed GetCnvt for Cigi4
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -152,8 +155,8 @@ int CigiCompCtrlV1::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) c
 
    CDta.d = DBuf;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    CIGI_SCOPY2(CDta.s++, &Data->EntityID);
 
@@ -239,8 +242,10 @@ int CigiCompCtrlV1::GetCnvt(CigiVersionID &CnvtVersion,
    // CIGI_ART_PART_CTRL_PACKET_ID_V2 are the same
    if(CnvtVersion.CigiMajorVersion < 3)
       CnvtInfo.CnvtPacketID = CIGI_COMP_CTRL_PACKET_ID_V2;
+   else if (CnvtVersion.CigiMajorVersion < 4)
+       CnvtInfo.CnvtPacketID = CIGI_SHORT_COMP_CTRL_PACKET_ID_V3;
    else
-      CnvtInfo.CnvtPacketID = CIGI_SHORT_COMP_CTRL_PACKET_ID_V3;
+      CnvtInfo.CnvtPacketID = CIGI_SHORT_COMP_CTRL_PACKET_ID_V4;
 
    return(CIGI_SUCCESS);
 

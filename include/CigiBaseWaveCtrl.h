@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,14 +66,19 @@
 #define CIGI_WAVE_CTRL_PACKET_ID_V3 14
 #define CIGI_WAVE_CTRL_PACKET_SIZE_V3 32
 
+#define CIGI_WAVE_CTRL_PACKET_ID_V4 0x0d
+#define CIGI_WAVE_CTRL_PACKET_SIZE_V4 32
+
 
 class CigiWaveCtrlV3;
+class CigiWaveCtrlV4;
 
 
 class CIGI_SPEC CigiBaseWaveCtrl : public CigiBasePacket
 {
 
 friend class CigiWaveCtrlV3;
+friend class CigiWaveCtrlV4;
 
 public:
 

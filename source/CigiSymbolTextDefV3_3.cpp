@@ -130,8 +130,8 @@ int CigiSymbolTextDefV3_3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = (PacketSize + Data->VariableDataSize);
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) (PacketSize + Data->VariableDataSize);
 
    *CDta.s++ = Data->SymbolID;
 
@@ -145,7 +145,7 @@ int CigiSymbolTextDefV3_3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *
 
    *CDta.f++ = Data->FontSize;
 
-   int tSz = Data->Text.size();
+   int tSz = (int)Data->Text.size();
    memcpy(CDta.c,Data->Text.c_str(),tSz);
    CDta.c += tSz;
    memset(CDta.c,0,(Data->VariableDataSize - tSz));

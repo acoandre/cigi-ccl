@@ -50,14 +50,14 @@
 // ====================================================================
 
 // ================================================
-// CigiBaseEntityCtrl
+// CigiBaseCircleSymbolData
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 CigiBaseCircleSymbolData::CigiBaseCircleSymbolData(void)
 {
 }
 
 // ================================================
-// ~CigiBaseEntityCtrl
+// ~CigiBaseCircleSymbolData
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 CigiBaseCircleSymbolData::~CigiBaseCircleSymbolData(void)
 {

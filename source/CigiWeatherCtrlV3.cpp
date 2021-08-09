@@ -79,6 +79,7 @@ CigiWeatherCtrlV3::CigiWeatherCtrlV3()
    PhenomenonType = 0;
    WeatherEn = false;
    ScudEn = false;
+   TopScudEn = false;
    RandomWindsEn = false;
    RandomLightningEn = false;
    CloudType = None;
@@ -88,10 +89,12 @@ CigiWeatherCtrlV3::CigiWeatherCtrlV3()
    VisibilityRng = 0.0;
    Opacity = 0.0;
    ScudFreq = 0.0;
+   TopScudFreq = 0.0;
    Coverage = 0.0;
    BaseElev = 0.0;
    Thickness = 0.0;
    Transition = 0.0;
+   TopTransition = 0.0;
    HorizWindSp = 0.0;
    VertWindSp = 0.0;
    WindDir = 0.0;
@@ -123,8 +126,8 @@ int CigiWeatherCtrlV3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    if(Data->Scope == Global)
       *CDta.s++ = 0;
@@ -258,6 +261,9 @@ int CigiWeatherCtrlV3::Unpack(Cigi_uint8 * Buff, bool Swap, void *Spec)
 
    Opacity = ((VisibilityRng/70000.0f)*100.0f);
 
+   TopScudEn = ScudEn;
+   TopScudFreq = ScudFreq;
+   TopTransition = Transition;
 
 
    return(PacketSize);

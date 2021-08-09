@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -70,10 +72,14 @@
 #define CIGI_VIEW_DEF_PACKET_ID_V3 21
 #define CIGI_VIEW_DEF_PACKET_SIZE_V3 32
 
+#define CIGI_VIEW_DEF_PACKET_ID_V4 0x14
+#define CIGI_VIEW_DEF_PACKET_SIZE_V4 40
+
 
 class CigiViewDefV1;
 class CigiViewDefV2;
 class CigiViewDefV3;
+class CigiViewDefV4;
 
 
 class CIGI_SPEC CigiBaseViewDef : public CigiBasePacket
@@ -82,6 +88,7 @@ class CIGI_SPEC CigiBaseViewDef : public CigiBasePacket
 friend class CigiViewDefV1;
 friend class CigiViewDefV2;
 friend class CigiViewDefV3;
+friend class CigiViewDefV4;
 
 public:
 

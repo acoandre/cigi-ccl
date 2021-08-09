@@ -57,6 +57,9 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  12/07/2018 Paul Slade                       Version 4.0.2
+ *  Fix for Cigi 4.0 support
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -84,11 +87,15 @@
 #define CIGI_RATE_CTRL_PACKET_ID_V3_2 8
 #define CIGI_RATE_CTRL_PACKET_SIZE_V3_2 32
 
+#define CIGI_VELOCITY_CTRL_PACKET_ID_V4 0x07
+#define CIGI_VELOCITY_CTRL_PACKET_SIZE_V4 32
+
 
 class CigiRateCtrlV1;
 class CigiRateCtrlV2;
 class CigiRateCtrlV3;
 class CigiRateCtrlV3_2;
+class CigiVelocityCtrlV4;
 
 
 class CIGI_SPEC CigiBaseRateCtrl : public CigiBasePacket
@@ -98,6 +105,7 @@ friend class CigiRateCtrlV1;
 friend class CigiRateCtrlV2;
 friend class CigiRateCtrlV3;
 friend class CigiRateCtrlV3_2;
+friend class CigiVelocityCtrlV4;
 
 public:
 
@@ -173,8 +181,10 @@ public:
       // V1 & V2 use the same packet id number
       if(CnvtVersion.CigiMajorVersion < 3)
          CnvtInfo.CnvtPacketID = CIGI_RATE_CTRL_PACKET_ID_V2;
-      else
+      else if (CnvtVersion.CigiMajorVersion < 4)
          CnvtInfo.CnvtPacketID = CIGI_RATE_CTRL_PACKET_ID_V3;
+      else
+	  CnvtInfo.CnvtPacketID = CIGI_VELOCITY_CTRL_PACKET_ID_V4;
 
       return(CIGI_SUCCESS);
    }

@@ -37,6 +37,9 @@
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Added new version conversion method.
  *  
+ *  12/07/2018 Paul Slade                       Version 4.0.2
+ *  Fix for Cigi 4.0 support
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -89,8 +92,10 @@ int CigiBaseTrajectoryDef::GetCnvt(CigiVersionID &CnvtVersion,
    // V1 & V2 have the same packet id number
    if(CnvtVersion.CigiMajorVersion < 3)
       CnvtInfo.CnvtPacketID = CIGI_TRAJECTORY_DEF_PACKET_ID_V2;
-   else
+   else if (CnvtVersion.CigiMajorVersion < 4)
       CnvtInfo.CnvtPacketID = CIGI_TRAJECTORY_DEF_PACKET_ID_V3;
+   else
+       CnvtInfo.CnvtPacketID = CIGI_ACCELERATION_CTRL_PACKET_ID_V4;
 
    return(CIGI_SUCCESS);
 }

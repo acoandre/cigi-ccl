@@ -59,6 +59,11 @@
  *  Added Extrapolation or Interpolation Smoothing flag.
  *  Added the defines and declarations for V3_3.
  *
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *
+ *  12/12/2018 Paul Slade                      Version 4.0.2
+ *  Removed TimeStampV4 (must now use TimeStampV3 instead) to allow correct version conversion
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -88,12 +93,15 @@
 #define CIGI_IG_CTRL_PACKET_ID_V3_3 1
 #define CIGI_IG_CTRL_PACKET_SIZE_V3_3 24
 
+#define CIGI_IG_CTRL_PACKET_ID_V4 0
+#define CIGI_IG_CTRL_PACKET_SIZE_V4 24
 
 class CigiIGCtrlV1;
 class CigiIGCtrlV2;
 class CigiIGCtrlV3;
 class CigiIGCtrlV3_2;
 class CigiIGCtrlV3_3;
+class CigiIGCtrlV4;
 
 
 //=========================================================
@@ -107,6 +115,7 @@ friend class CigiIGCtrlV2;
 friend class CigiIGCtrlV3;
 friend class CigiIGCtrlV3_2;
 friend class CigiIGCtrlV3_3;
+friend class CigiIGCtrlV4;
 
 public:
 
@@ -129,9 +138,6 @@ public:
       Disable=0,
       Enable=1
    };
-
-
-
 
    //==> Management
 
@@ -291,6 +297,13 @@ protected:
    //! Specifies IG frame received last<br>
    //!
    Cigi_uint32 LastRcvdIGFrame;
+
+   //=========================================================
+   //! Entity Tpye Substitution Enable<br>
+   //!  true - Enables the substutution of all entity types<br>
+   //!  false - Disables the substutution of all entity types<br>
+   //!
+   bool EntityTypeSubEn;
 
    //=========================================================
    //! Time Stamp - V1 format<br>

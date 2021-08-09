@@ -101,8 +101,8 @@ int CigiEarthModelDefV3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Sp
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    *CDta.c++ = (Data->CustomERMEn) ? 0x01 : 0;
 

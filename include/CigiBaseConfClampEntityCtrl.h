@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,14 +66,18 @@
 #define CIGI_CONF_CLAMP_ENTITY_CTRL_PACKET_ID_V3 3
 #define CIGI_CONF_CLAMP_ENTITY_CTRL_PACKET_SIZE_V3 24
 
+#define CIGI_CONF_CLAMP_ENTITY_CTRL_PACKET_ID_V4 0x02
+#define CIGI_CONF_CLAMP_ENTITY_CTRL_PACKET_SIZE_V4 32
 
 class CigiConfClampEntityCtrlV3;
+class CigiConfClampEntityCtrlV4;
 
 
 class CIGI_SPEC CigiBaseConfClampEntityCtrl : public CigiBasePacket
 {
 
 friend class CigiConfClampEntityCtrlV3;
+friend class CigiConfClampEntityCtrlV4;
 
 public:
 

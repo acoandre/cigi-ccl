@@ -31,6 +31,9 @@
  *  03/11/2008 Greg Basler                       2.0.0
  *  Initial Release.
  *
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *
+ *  Modified CnvtPacketID to allow 16bit packet id size
  *  Author: The Boeing Company
  *
  * </pre>
@@ -58,7 +61,7 @@ namespace CigiCnvtInfoType
       //! The packet ID of the packet
       //!  to which this packet will
       //!  be converted.
-      Cigi_uint8 CnvtPacketID;
+      Cigi_uint16 CnvtPacketID;
 
    } Type;
 }

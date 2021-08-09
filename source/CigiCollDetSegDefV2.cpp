@@ -130,8 +130,8 @@ int CigiCollDetSegDefV2::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Sp
 
    CDta.d = DBuf;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    CIGI_SCOPY2(CDta.s++, &Data->EntityID);
 

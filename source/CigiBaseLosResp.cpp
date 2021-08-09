@@ -33,6 +33,10 @@
  *  
  *  01/21/2005 Greg Basler                       Version 1.5
  *  Defined _EXPORT_CCL_ for exporting the class in a Windows DLL.
+ *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *
  * </pre>
  *  Author: The Boeing Company
  *

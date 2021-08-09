@@ -64,6 +64,18 @@
  *  06/23/2006 Greg Basler                       Version 1.7.1
  *  Changed native char and unsigned char types to CIGI types Cigi_int8 and 
  *  Cigi_uint8.
+ *
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *
+ *  12/07/2018 Paul Slade                        Version 4.0.2
+ *  Modified RegisterUserPacket to not return error if the packet type is just
+ *  not required by this session type
+ *  Fixed registration of V3 user defined packets
+ *
+ *  04/25/2019 Barry Folse                       Version 4.0.3
+ *  Added a lock/mutex. This dependency will be required as long as replies
+ *  can happen as a result of a call from an async thread.
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -85,6 +97,13 @@
 #include "CigiDefaultPacket.h"
 
 class CigiSession;
+
+// Put in by Presagis
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <pthread.h>
+#endif
 
 //=========================================================
 //! The class for the outgoing message
@@ -536,6 +555,7 @@ public:
 
    //+> Registering
 
+
    //=========================================================
    //! Register a user packet for use.
    //! \param Packet - A pointer to the packet manager object
@@ -548,12 +568,20 @@ public:
    //! \return the a flag specifying whether the specified
    //!   packet is valid to send.
    //!
-	int RegisterUserPacket(CigiBasePacket *Packet,
-                          Cigi_uint8 PacketID,
+	virtual int RegisterUserPacket(CigiBasePacket *Packet,
+                          Cigi_uint16 PacketID,
                           bool HostSend,
                           bool IGSend);
 
 
+private:
+
+    // Put in by Presagis
+#ifdef _WIN32
+    CRITICAL_SECTION m_msgLock;
+#else
+    pthread_mutex_t m_msgLock;
+#endif
 
 
 protected:
@@ -682,6 +710,18 @@ protected:
 	void SetOutgoingIGV3Tbls(void);
 
    //=========================================================
+   //! Sets the external interface tables to Host output with
+   //!   Cigi Version 4 packets
+   //!
+	void SetOutgoingHostV4Tbls(void);
+
+   //=========================================================
+   //! Sets the external interface tables to IG output with
+   //!   Cigi Version 4 packets
+   //!
+	void SetOutgoingIGV4Tbls(void);
+
+   //=========================================================
    //! Inserts a new buffer into the active buffer list
    //!  and initiates it as the buffer currently being filled.
    //!
@@ -732,12 +772,12 @@ protected:
    //=========================================================
    //! The Conversion Table for managers of outgoing packets
    //!
-   CigiBasePacket *OutgoingHandlerTbl[256];
+   CigiBasePacket *OutgoingHandlerTbl[0xffff];
 
    //=========================================================
    //! The Packet valid to send Table
    //!
-   bool VldSnd[256];
+   bool VldSnd[0xffff];
 
    //=========================================================
    //! The current frame count
@@ -752,12 +792,12 @@ protected:
    //=========================================================
    //! An Array of IGCtrl packers
    //!
-   CigiBaseIGCtrl *pIGCtrlPck[6];
+   CigiBaseIGCtrl *pIGCtrlPck[7];
 
    //=========================================================
    //! An Array of SOF packers
    //!
-   CigiBaseSOF *pSOFPck[5];
+   CigiBaseSOF *pSOFPck[6];
 
 
 

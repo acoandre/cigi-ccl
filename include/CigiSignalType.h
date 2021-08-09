@@ -34,6 +34,12 @@
  *  2008.04.03 Greg Basler                       2.1.0
  *  Fixed signals and added symbol signals.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  Added SigVelocity, SigAcceleration, SigSymbolTexturedCircleDef,
+ *  SigSymbolTexturedPolygonDef, SigSymbolPolygonDef, SigEntityPositionCtrl
+ *  SigAnimationCtrl
+ *
  *  Author: The Boeing Company
  *
  * </pre>
@@ -107,7 +113,15 @@ namespace CigiSignalType
       SigSymbolTextDef,
       SigSymbolCircleDef,
       SigSymbolLineDef,
-      SigSymbolClone
+      SigSymbolClone,
+      SigVelocityCtrl,  // chas
+      SigAccelerationCtrl,  // chas
+      SigSymbolPolygonDef, // chas
+      SigSymbolTexturedCircleDef, // chas
+      SigSymbolTexturedPolygonDef, // chas
+      SigEntityPositionCtrl, // chas
+      SigAnimationCtrl, // chas
+      SigMax
    } Type;
 }
 

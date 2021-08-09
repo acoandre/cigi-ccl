@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -71,10 +73,14 @@
 #define CIGI_SENSOR_CTRL_PACKET_ID_V3 17
 #define CIGI_SENSOR_CTRL_PACKET_SIZE_V3 24
 
+#define CIGI_SENSOR_CTRL_PACKET_ID_V4 0x10
+#define CIGI_SENSOR_CTRL_PACKET_SIZE_V4 32
+
 
 class CigiSensorCtrlV1;
 class CigiSensorCtrlV2;
 class CigiSensorCtrlV3;
+class CigiSensorCtrlV4;
 
 
 class CIGI_SPEC CigiBaseSensorCtrl : public CigiBasePacket
@@ -83,6 +89,7 @@ class CIGI_SPEC CigiBaseSensorCtrl : public CigiBasePacket
 friend class CigiSensorCtrlV1;
 friend class CigiSensorCtrlV2;
 friend class CigiSensorCtrlV3;
+friend class CigiSensorCtrlV4;
 
 public:
 

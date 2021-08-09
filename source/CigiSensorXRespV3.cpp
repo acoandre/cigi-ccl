@@ -44,6 +44,9 @@
  *  06/23/2006 Greg Basler                       Version 1.7.1
  *  Changed native char and unsigned char types to CIGI types Cigi_int8 and 
  *  Cigi_uint8.
+ *
+ *  12/14/2018 Paul Slade                       Version 4.0.2
+ *  Fixed GetCnvt for Cigi4
  * </pre>
  *  Author: The Boeing Company
  *
@@ -111,8 +114,8 @@ int CigiSensorXRespV3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    *CDta.s++ = Data->ViewID;
    *CDta.c++ = Data->SensorID;
@@ -207,8 +210,10 @@ int CigiSensorXRespV3::GetCnvt(CigiVersionID &CnvtVersion,
    // CIGI_SENSOR_RESP_PACKET_ID_V2 are the same
    if(CnvtVersion.CigiMajorVersion < 3)
       CnvtInfo.CnvtPacketID = CIGI_SENSOR_RESP_PACKET_ID_V2;
-   else
+   else if (CnvtVersion.CigiMajorVersion < 4)
       CnvtInfo.CnvtPacketID = CIGI_SENSOR_XRESP_PACKET_ID_V3;
+   else
+       CnvtInfo.CnvtPacketID = CIGI_SENSOR_XRESP_PACKET_ID_V4;
 
    return(CIGI_SUCCESS);
 }

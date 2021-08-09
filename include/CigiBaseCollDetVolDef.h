@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -67,9 +69,13 @@
 #define CIGI_COLL_DET_VOL_DEF_PACKET_ID_V3 23
 #define CIGI_COLL_DET_VOL_DEF_PACKET_SIZE_V3 48
 
+#define CIGI_COLL_DET_VOL_DEF_PACKET_ID_V4 0x16
+#define CIGI_COLL_DET_VOL_DEF_PACKET_SIZE_V4 48
+
 
 class CigiCollDetVolDefV2;
 class CigiCollDetVolDefV3;
+class CigiCollDetVolDefV4;
 
 
 class CIGI_SPEC CigiBaseCollDetVolDef : public CigiBasePacket
@@ -77,6 +83,7 @@ class CIGI_SPEC CigiBaseCollDetVolDef : public CigiBasePacket
 
 friend class CigiCollDetVolDefV2;
 friend class CigiCollDetVolDefV3;
+friend class CigiCollDetVolDefV4;
 
 public:
 

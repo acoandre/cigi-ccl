@@ -51,10 +51,22 @@
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Added new version conversion method.
  *  
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *  Added PRAGMA to remove C4251 warnings
+ *
+ *  12/13/2018 Paul Slade                       Version 4.0.2
+ *  Made GetCnvt set ProcID to ProcNone if PacketID is 0. This fixes issue
+ *  with unset IncomingHandlerTbl and outGoingHandlerTbl entries causing 
+ *  packet to be interpreted as an IGControl packet (0)
+ *
  * </pre>
  *  Author: The Boeing Company
  *
  */
+
+#if _MSC_VER >= 1500 // VC9
+#pragma warning (disable : 4251)
+#endif
 
 #if !defined(_CIGI_BASE_PACKET_INCLUDED_)
 #define _CIGI_BASE_PACKET_INCLUDED_
@@ -123,7 +135,7 @@ public:
 	virtual int GetCnvt(CigiVersionID &CnvtVersion,
                        CigiCnvtInfoType::Type &CnvtInfo)
    {
-      CnvtInfo.ProcID = CigiProcessType::ProcStd;
+      CnvtInfo.ProcID = (PacketID == 0 ? CigiProcessType::ProcNone : CigiProcessType::ProcStd);
       CnvtInfo.CnvtPacketID = PacketID;
 
       return(CIGI_SUCCESS);
@@ -133,13 +145,13 @@ public:
    //! Gets the packet id.
    //! \return The packet id.
    //!
-   Cigi_uint8 GetPacketID(void) const { return(PacketID); }
+   Cigi_uint16 GetPacketID(void) const { return(PacketID); }
 
    //=========================================================
    //! Gets the size of the packet.
    //! \return The size in bytes of the packet.
    //!
-   Cigi_uint8 GetPacketSize(void) const { return(PacketSize); }
+   Cigi_uint16 GetPacketSize(void) const { return(PacketSize); }
 
    //=========================================================
    //! Gets the CIGI version of this packet.
@@ -159,12 +171,12 @@ protected:
    //=========================================================
    //! Packet ID or Opcode
    //!
-	Cigi_uint8 PacketID;
+	Cigi_uint16 PacketID;
 
    //=========================================================
    //! Packet size in bytes
    //!
-	Cigi_uint8 PacketSize;
+	Cigi_uint16 PacketSize;
 
    //=========================================================
    //! CIGI version of this packet

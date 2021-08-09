@@ -45,6 +45,11 @@
  *  06/23/2006 Greg Basler                       Version 1.7.1
  *  Changed native char and unsigned char types to CIGI types Cigi_int8 and 
  *  Cigi_uint8.
+ *
+ *  01/23/2019 Paul Slade                       Version 4.0.2
+ *  Added VersionChangeCB mechanism to allow user code to re-register user
+ *  defined packets when either CigiIncomingMsg or CigiOutgoingMsg external
+ *  CIGI version changes.
  * </pre>
  *  Author: The Boeing Company
  *
@@ -115,7 +120,63 @@ friend class CigiSession;
    //! \return This returns CIGI_SUCCESS or an error code 
    //!   defined in CigiErrorCodes.h
    //!
-	int CreateBuffer(const int NumBuf = 2, const int BufLen = 16384);
+    int CreateBuffer(const int NumBuf = 2, const int BufLen = 16384);
+
+    //==> Version change functions
+
+    //=========================================================
+    //! Prototype for callback function
+    //! \param majorVersion -the new major version
+    //! \param minorVer -the new minor version
+    //! \param user -will be set the same as user parameter
+    //!              was set to in SetVersionChangeCallback
+    //!
+    typedef void (*VersionChangeCBFN)(int majorVersion, int minorVer, void *user);
+
+    //=========================================================
+    //! This sets a function to be called whenever the CIGI 
+    //! version of the interface changes.
+    //! For CigiOutgoingMsg this happens if the received CIGI
+    //! packet is a higher version than the current outgoing
+    //! version.
+    //! For CigiIncomingMsg this happens when the first packet
+    //! is received, and susequently whenever the version of the
+    //! received packet changes.
+    //! In the callback function the user should re-register all
+    //! user defined packets that are to be handled by the 
+    //! interface with the appropriate derived class for the
+    //! specified version.
+    //! \param cb - pointer to callback funtion or NULL to disable
+    //!
+    void SetVersionChangeCallback(VersionChangeCBFN cb, void *user) { VersionChangeCB = cb; VersionChangeCBUser = user; }
+
+    //=========================================================
+    //! This gets the function to be called whenever the CIGI 
+    //! version of the interface changes.
+    //! \return This returns the callback funtion pointer 
+    //!
+    VersionChangeCBFN VersionChangeCallback() const { return VersionChangeCB; }
+
+    void *VersionChangeCallbackUser() const { return VersionChangeCBUser;  }
+
+    //+> Registering
+
+    //=========================================================
+    //! Register a user packet for use.
+    //! \param Packet - A pointer to the packet manager object
+    //! \param PacketID - The packet id
+    //! \param HostSend - A flag specifying whether the host
+    //!   can send this packet.
+    //! \param IGSend - A flag specifying whether the IG
+    //!   can send this packet.
+    //!
+    //! \return the a flag specifying whether the specified
+    //!   packet is valid to send.
+    //!
+    virtual int RegisterUserPacket(CigiBasePacket *Packet,
+	Cigi_uint16 PacketID,
+	bool HostSend,
+	bool IGSend) = 0;
 
 
 protected:
@@ -172,6 +233,13 @@ protected:
    //!
    CigiSession *Session;
 
+
+   //=========================================================
+   //! Callback funtion to be called whenever the CIGI version
+   //! changes
+   //!
+   VersionChangeCBFN VersionChangeCB;
+   void *VersionChangeCBUser;
 
    //==> Member Protected Functions
 

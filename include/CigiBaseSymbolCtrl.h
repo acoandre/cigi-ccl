@@ -34,6 +34,9 @@
  *  04/03/2008 Greg Basler                       2.1.0
  *  Updated packet id to reflect the ICD.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -52,8 +55,12 @@
 #define CIGI_SYMBOL_CONTROL_PACKET_ID_V3_3 34
 #define CIGI_SYMBOL_CONTROL_PACKET_SIZE_V3_3 40
 
+#define CIGI_SYMBOL_CONTROL_PACKET_ID_V4 0x21
+#define CIGI_SYMBOL_CONTROL_PACKET_SIZE_V4 48
+
 
 class CigiSymbolCtrlV3_3;
+class CigiSymbolCtrlV4;
 
 
 //=========================================================
@@ -64,6 +71,7 @@ class CIGI_SPEC CigiBaseSymbolCtrl :
 {
 
    friend class CigiSymbolCtrlV3_3;
+   friend class CigiSymbolCtrlV4;
 
 public:
 

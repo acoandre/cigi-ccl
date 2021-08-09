@@ -96,6 +96,7 @@ CigiWeatherCtrlV1::CigiWeatherCtrlV1()
    PhenomenonType = 0;
    WeatherEn = false;
    ScudEn = false;
+   TopScudEn = false;
    RandomWindsEn = false;
    RandomLightningEn = false;
    CloudType = None;
@@ -105,10 +106,12 @@ CigiWeatherCtrlV1::CigiWeatherCtrlV1()
    VisibilityRng = 0.0;
    Opacity = 0.0;
    ScudFreq = 0.0;
+   TopScudFreq = 0.0;
    Coverage = 0.0;
    BaseElev = 0.0;
    Thickness = 0.0;
    Transition = 0.0;
+   TopTransition = 0.0;
    HorizWindSp = 0.0;
    VertWindSp = 0.0;
    WindDir = 0.0;
@@ -144,8 +147,8 @@ int CigiWeatherCtrlV1::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec
 
    CDta.d = DBuf;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    CIGI_SCOPY2(CDta.s++, &Data->EntityID);
 
@@ -275,6 +278,10 @@ int CigiWeatherCtrlV1::Unpack(Cigi_uint8 * Buff, bool Swap, void *Spec)
       else
          LayerID = 255;
    }
+
+   TopScudEn = ScudEn;
+   TopScudFreq = ScudFreq;
+   TopTransition = Transition;
 
    VertWindSp = 0.0f;
    BaroPress = 1013.25f;

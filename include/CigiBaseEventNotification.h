@@ -47,6 +47,9 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -65,14 +68,19 @@
 #define CIGI_EVENT_NOTIFICATION_PACKET_ID_V3 116
 #define CIGI_EVENT_NOTIFICATION_PACKET_SIZE_V3 16
 
+#define CIGI_EVENT_NOTIFICATION_PACKET_ID_V4 0x0ff1
+#define CIGI_EVENT_NOTIFICATION_PACKET_SIZE_V4 24
+
 
 class CigiEventNotificationV3;
+class CigiEventNotificationV4;
 
 
 class CIGI_SPEC CigiBaseEventNotification : public CigiBasePacket
 {
 
 friend class CigiEventNotificationV3;
+friend class CigiEventNotificationV4;
 
 public:
 

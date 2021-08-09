@@ -31,6 +31,9 @@
  *  03/11/2008 Greg Basler                       CIGI_SYM_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -75,10 +78,15 @@ int CigiBaseSymbolCtrl::GetCnvt(CigiVersionID &CnvtVersion,
       CnvtInfo.ProcID = CigiProcessType::ProcNone;
       CnvtInfo.CnvtPacketID = 0;
    }
-   else
+   else if(CnvtVersion.GetCombinedCigiVersion() < 0x0400)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcStd;
       CnvtInfo.CnvtPacketID = CIGI_SYMBOL_CONTROL_PACKET_ID_V3_3;
+   }
+   else
+   {
+      CnvtInfo.ProcID = CigiProcessType::ProcStd;
+      CnvtInfo.CnvtPacketID = CIGI_SYMBOL_CONTROL_PACKET_ID_V4;
    }
 
    return(CIGI_SUCCESS);

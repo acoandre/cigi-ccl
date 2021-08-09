@@ -177,7 +177,7 @@ int CigiSymbolCircleDefV3_3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
    *CDta.c++ = (PacketSize + Data->VariableDataSize);
 
    *CDta.s++ = Data->SymbolID;
@@ -285,7 +285,7 @@ int CigiSymbolCircleDefV3_3::Unpack(Cigi_uint8 * Buff, bool Swap, void *Spec)
 CigiBaseCircleSymbolData * CigiSymbolCircleDefV3_3::AddCircle(void)
 {
    CigiCircleSymbolDataV3_3 *NewCircle = NULL;
-   int Cnt = Circles.size();
+   int Cnt = (int)Circles.size();
 
    if(Cnt < 10)
    {
@@ -304,7 +304,7 @@ int CigiSymbolCircleDefV3_3::RemoveCircle(int CircleIndex, bool bndchk)
 {
    int stat = CIGI_SUCCESS;
 
-   int Cnt = Circles.size();
+   int Cnt = (int)Circles.size();
 
    if((CircleIndex >= 0) && (CircleIndex < Cnt))
    {

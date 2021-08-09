@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,14 +66,19 @@
 #define CIGI_TERRESTRIAL_SURFACE_CTRL_PACKET_ID_V3 15
 #define CIGI_TERRESTRIAL_SURFACE_CTRL_PACKET_SIZE_V3 8
 
+#define CIGI_TERRESTRIAL_SURFACE_CTRL_PACKET_ID_V4 0x0e
+#define CIGI_TERRESTRIAL_SURFACE_CTRL_PACKET_SIZE_V4 16
+
 
 class CigiTerrestrialSurfaceCtrlV3;
+class CigiTerrestrialSurfaceCtrlV4;
 
 
 class CIGI_SPEC CigiBaseTerrestrialSurfaceCtrl : public CigiBasePacket
 {
 
 friend class CigiTerrestrialSurfaceCtrlV3;
+friend class CigiTerrestrialSurfaceCtrlV4;
 
 public:
 

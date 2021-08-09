@@ -31,6 +31,8 @@
  *  03/11/2008 Greg Basler                       CIGI_SYM_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -52,8 +54,12 @@
 #define CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_ID_V3_3 31
 #define CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_SIZE_V3_3 16
 
+#define CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_ID_V4 0x1e
+#define CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_SIZE_V4 24 // + ( 24 * n ), n = number of circle definitions
+
 
 class CigiSymbolCircleDefV3_3;
+class CigiSymbolCircleDefV4;
 
 
 //=========================================================
@@ -64,6 +70,7 @@ class CIGI_SPEC CigiBaseSymbolCircleDef :
 {
 
    friend class CigiSymbolCircleDefV3_3;
+   friend class CigiSymbolCircleDefV4;
 
 public:
 

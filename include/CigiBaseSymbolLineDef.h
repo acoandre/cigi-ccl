@@ -52,8 +52,12 @@
 #define CIGI_SYMBOL_LINE_DEFINITION_PACKET_ID_V3_3 32
 #define CIGI_SYMBOL_LINE_DEFINITION_PACKET_SIZE_V3_3 16
 
+#define CIGI_SYMBOL_POLYGON_DEFINITION_PACKET_ID_V4 0x1f
+#define CIGI_SYMBOL_POLYGON_DEFINITION_PACKET_SIZE_V4 24
+
 
 class CigiSymbolLineDefV3_3;
+class CigiSymbolPolygonDefV4;
 
 
 //=========================================================
@@ -64,6 +68,7 @@ class CIGI_SPEC CigiBaseSymbolLineDef :
 {
 
    friend class CigiSymbolLineDefV3_3;
+   friend class CigiSymbolPolygonDefV4;
 
 public:
 

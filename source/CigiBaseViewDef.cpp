@@ -41,6 +41,8 @@
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Added new version conversion method.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -92,8 +94,10 @@ int CigiBaseViewDef::GetCnvt(CigiVersionID &CnvtVersion,
    // V1 & V2 have the same packet id number
    if(CnvtVersion.CigiMajorVersion < 3)
       CnvtInfo.CnvtPacketID = CIGI_VIEW_DEF_PACKET_ID_V2;
-   else
+   else if(CnvtVersion.CigiMajorVersion < 4)
       CnvtInfo.CnvtPacketID = CIGI_VIEW_DEF_PACKET_ID_V3;
+   else
+      CnvtInfo.CnvtPacketID = CIGI_VIEW_DEF_PACKET_ID_V4;
 
    return(CIGI_SUCCESS);
 }

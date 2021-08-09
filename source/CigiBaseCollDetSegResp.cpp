@@ -88,8 +88,10 @@ int CigiBaseCollDetSegResp::GetCnvt(CigiVersionID &CnvtVersion,
    // Note: V1 & V2 are the same
    if(CnvtVersion.CigiMajorVersion < 3)
       CnvtInfo.CnvtPacketID = CIGI_COLL_DET_SEG_RESP_PACKET_ID_V2;
-   else
+   else if(CnvtVersion.CigiMajorVersion < 4)
       CnvtInfo.CnvtPacketID = CIGI_COLL_DET_SEG_RESP_PACKET_ID_V3;
+   else
+      CnvtInfo.CnvtPacketID = CIGI_COLL_DET_SEG_RESP_PACKET_ID_V4;
 
    return(CIGI_SUCCESS);
 }

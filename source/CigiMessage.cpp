@@ -66,6 +66,8 @@ CigiMessage::CigiMessage()
 , PackagedMsg(NULL)
 , ATbl(NULL)
 , Session(NULL)
+, VersionChangeCB(NULL)
+, VersionChangeCBUser(NULL)
 {
 
 }
@@ -111,7 +113,7 @@ int CigiMessage::CreateBuffer(const int NumBuf, const int BufLen)
    if(BufferSize <= 0)
       BufferSize = BufLen;
 
-   int BuffCnt = AvailBuff.size();
+   int BuffCnt = (int)AvailBuff.size();
    int AddBuff = 0;
    if(BuffCnt < NumBuf)
       AddBuff = NumBuf - BuffCnt;

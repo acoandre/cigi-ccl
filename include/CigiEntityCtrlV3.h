@@ -45,7 +45,11 @@
  *  
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Moved Packet information to base packet.
- *  
+ *
+ *  12/13/2018 Paul Slade                       Version 4.0.2
+ *  Fixes required to allow correct version conversion
+ *  Moved accessors that are not supported in V4 packet out of base class *
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -165,6 +169,188 @@ public:
    float GetYaw(void) const { return(Yaw); }
 
 
+   //+> Parent ID
+
+   //=========================================================
+   //! Sets the Parent ID with bound checking control
+   //! \param ParentIDIn - If this is an attached entity,
+   //!   this specifies to which entity this entity is attached.
+   //! \param bndchk - Enables (true) or disables (false) bounds checking
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+   int SetParentID(const Cigi_uint16 ParentIDIn, bool bndchk = true)
+   {
+       ParentID = ParentIDIn;
+       return(CIGI_SUCCESS);
+   }
+
+   //=========================================================
+   //! Gets the Parent ID value
+   //! \return ParentID specifies to which entity this entity is attached,
+   //!   if this is an attached entity.
+   //!
+   Cigi_uint16 GetParentID(void) const { return(ParentID); }
+
+
+   //+> Pitch
+
+   //=========================================================
+   //! Sets the Pitch with bound checking control
+   //! \param PitchIn - Specifies the pitch of the entity
+   //!   (-90.0 to +90.0)
+   //! \param bndchk - Enables (true) or disables (false) bounds checking
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+   int SetPitch(const float PitchIn, bool bndchk = true);
+
+   //=========================================================
+   //! Gets the Pitch value
+   //! \return Pitch specifies the pitch of the entity
+   //!   (-90.0 to +90.0)
+   //!
+   float GetPitch(void) const { return(Pitch); }
+
+
+   //+> Roll
+
+   //=========================================================
+   //! Sets the Roll with bound checking control
+   //! \param RollIn - Specifies the roll of the entity
+   //!   (-180.0 to +180.0)
+   //! \param bndchk - Enables (true) or disables (false) bounds checking
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+   int SetRoll(const float RollIn, bool bndchk = true);
+
+   //=========================================================
+   //! Gets the Roll value
+   //! \return Roll specifies the roll of the entity
+   //!   (-180.0 to +180.0)
+   //!
+   float GetRoll(void) const { return(Roll); }
+
+
+   //+> Latitude
+
+   //=========================================================
+   //! Sets the Latitude with bound checking control
+   //! \param Lat - Specifies the Latitude of the entity
+   //!   (-90.0 to +90.0)
+   //! \param bndchk - Enables (true) or disables (false) bounds checking
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+   int SetLat(const double Lat, bool bndchk = true);
+
+   //=========================================================
+   //! Gets the Latitude value
+   //! \return LatOrXoff specifies the Latitude of the entity
+   //!   (-90.0 to +90.0)
+   //!
+   double GetLat(void) const { return(LatOrXoff); }
+
+
+   //+> X Offset
+
+   //=========================================================
+   //! Sets the X Offset with bound checking control
+   //! \param Xoff - Specifies the X axis Offset from 
+   //!   the Parent entity's origin.
+   //! \param bndchk - Enables (true) or disables (false) bounds checking
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+   int SetXoff(const double Xoff, bool bndchk = true)
+   {
+       LatOrXoff = Xoff;
+       return(CIGI_SUCCESS);
+   }
+
+   //=========================================================
+   //! Gets the X Offset value
+   //! \return LatOrXoff specifies the X axis Offset from 
+   //!   the Parent entity's origin.
+   //!
+   double GetXoff(void) const { return(LatOrXoff); }
+
+
+   //+> Longitude
+
+   //=========================================================
+   //! Sets the Longitude with bound checking control
+   //! \param Lon - Specifies the Longitude of the entity
+   //!   (-180.0 to +180.0)
+   //! \param bndchk - Enables (true) or disables (false) bounds checking
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+   int SetLon(const double Lon, bool bndchk = true);
+
+   //=========================================================
+   //! Getting the Longitude value
+   //! \return LonOrYoff specifies the Longitude of the entity
+   //!   (-180.0 to +180.0)
+   //!
+   double GetLon(void) const { return(LonOrYoff); }
+
+
+   //+> Y Offset
+
+   //=========================================================
+   //! Sets the Y Offset with bound checking control
+   //! \param Yoff - Specifies the Y axis Offset from 
+   //!   the Parent entity's origin.
+   //! \param bndchk - Enables (true) or disables (false) bounds checking
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+   int SetYoff(const double Yoff, bool bndchk = true)
+   {
+       LonOrYoff = Yoff;
+       return(CIGI_SUCCESS);
+   }
+
+   //=========================================================
+   //! Gets the Y Offset value
+   //! \return LonOrYoff specifies the Y axis Offset from 
+   //!   the Parent entity's origin.
+   //!
+   double GetYoff(void) const { return(LonOrYoff); }
+
+
+   //+> Attach State Flag
+
+   //=========================================================
+   //! Sets the Attach State Flag with bound checking control
+   //! \param AttachStateIn - Specifies whether this entity is independant
+   //!   or attached to a parent entity.
+   //!   0 Detach   (independent)
+   //!   1 Attach
+   //! \param bndchk - Enables (true) or disables (false) bounds checking
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+   int SetAttachState(const AttachStateGrp AttachStateIn, bool bndchk = true);
+
+   //=========================================================
+   //! Gets the Attach State Flag value
+   //! \return AttachState specifies whether this entity is independant
+   //!   or attached to a parent entity.
+   //!   0 Detach
+   //!   1 Attach
+   //!
+   AttachStateGrp GetAttachState(void) const { return(AttachState); }
 
    //+> Altitude
 

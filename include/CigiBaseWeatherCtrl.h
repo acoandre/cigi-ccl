@@ -46,6 +46,11 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *
+ *  12/30/2019 Chas Whitley                      Version 4.0.0 rev 4
+ *  Add Layer ID enumerations
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -70,10 +75,14 @@
 #define CIGI_WEATHER_CTRL_PACKET_ID_V3 12
 #define CIGI_WEATHER_CTRL_PACKET_SIZE_V3 56
 
+#define CIGI_WEATHER_CTRL_PACKET_ID_V4 0x0b
+#define CIGI_WEATHER_CTRL_PACKET_SIZE_V4 72
+
 
 class CigiWeatherCtrlV1;
 class CigiWeatherCtrlV2;
 class CigiWeatherCtrlV3;
+class CigiWeatherCtrlV4;
 
 
 class CIGI_SPEC CigiBaseWeatherCtrl : public CigiBasePacket
@@ -82,6 +91,7 @@ class CIGI_SPEC CigiBaseWeatherCtrl : public CigiBasePacket
 friend class CigiWeatherCtrlV1;
 friend class CigiWeatherCtrlV2;
 friend class CigiWeatherCtrlV3;
+friend class CigiWeatherCtrlV4;
 
 public:
 
@@ -118,6 +128,22 @@ public:
       Entity=2
    };
 
+   //=========================================================
+   //! The enumeration for the CigiBaseWeatherCtrl Group
+   //!
+   enum LayerIDGrp
+   {
+      GroundFog=0,
+      CloudLayer1=1,
+      CloudLayer2=2,
+      CloudLayer3=3,
+      Rain=4,
+      Snow=5,
+      Sleet=6,
+      Hail=7,
+      Sand=8,
+      Dust=9
+   };
 
 
 
@@ -234,7 +260,7 @@ public:
    //!   defined in CigiErrorCodes.h
    int SetScudEn(const bool ScudEnIn, bool bndchk=true)
    {
-      ScudEn = ScudEnIn;
+      TopScudEn = ScudEn = ScudEnIn;
       return(CIGI_SUCCESS);
    }
 
@@ -407,7 +433,7 @@ public:
    //!   defined in CigiErrorCodes.h
    int SetTransition(const float TransitionIn, bool bndchk=true)
    {
-      Transition = TransitionIn;
+      TopTransition = Transition = TransitionIn;
       return(CIGI_SUCCESS);
    }
 
@@ -617,6 +643,27 @@ protected:
    //!
    float Aerosol;
 
+protected:
+
+   //==> Member variables
+
+   //=========================================================
+   //! TopScudEn<br>
+   //! Enables Top Scud
+   //!
+   bool TopScudEn;
+
+   //=========================================================
+   //! TopScudFreq<br>
+   //! Top Scud frequency (i.e. percentage coverage.)
+   //!
+   float TopScudFreq;
+
+   //=========================================================
+   //! TopThickness<br>
+   //! Top Thickness of the cloud from bottom to top.
+   //!
+   float TopTransition;
 
 };
 

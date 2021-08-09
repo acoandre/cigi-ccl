@@ -49,6 +49,9 @@
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -83,6 +86,9 @@
 #define CIGI_HAT_HOT_RESP_PACKET_ID_V3 102
 #define CIGI_HAT_HOT_RESP_PACKET_SIZE_V3 16
 
+#define CIGI_HAT_HOT_RESP_PACKET_ID_V4 0x0fff
+#define CIGI_HAT_HOT_RESP_PACKET_SIZE_V4 16
+
 #define CIGI_HAT_HOT_XRESP_PACKET_ID_V3 103
 #define CIGI_HAT_HOT_XRESP_PACKET_SIZE_V3 40
 
@@ -92,14 +98,19 @@
 #define CIGI_HAT_HOT_XRESP_PACKET_ID_V3_2 103
 #define CIGI_HAT_HOT_XRESP_PACKET_SIZE_V3_2 40
 
+#define CIGI_HAT_HOT_XRESP_PACKET_ID_V4 0x0ffe
+#define CIGI_HAT_HOT_XRESP_PACKET_SIZE_V4 40
+
 
 class CigiHatRespV1;
 class CigiHatRespV2;
 class CigiHotRespV2;
 class CigiHatHotRespV3;
+class CigiHatHotRespV4;
 class CigiHatHotXRespV3;
 class CigiHatHotRespV3_2;
 class CigiHatHotXRespV3_2;
+class CigiHatHotXRespV4;
 
 
 class CIGI_SPEC CigiBaseHatHotResp : public CigiBasePacket
@@ -109,9 +120,11 @@ friend class CigiHatRespV1;
 friend class CigiHatRespV2;
 friend class CigiHotRespV2;
 friend class CigiHatHotRespV3;
+friend class CigiHatHotRespV4;
 friend class CigiHatHotXRespV3;
 friend class CigiHatHotRespV3_2;
 friend class CigiHatHotXRespV3_2;
+friend class CigiHatHotXRespV4;
 
 public:
 

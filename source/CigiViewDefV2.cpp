@@ -138,8 +138,8 @@ int CigiViewDefV2::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) co
 
    CDta.d = DBuf;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    Cigi_uint8 HDta = 0;
    if(Data->ViewID < 32)

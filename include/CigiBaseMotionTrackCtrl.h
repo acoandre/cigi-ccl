@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,10 +66,14 @@
 #define CIGI_MOTION_TRACK_CTRL_PACKET_ID_V3 18
 #define CIGI_MOTION_TRACK_CTRL_PACKET_SIZE_V3 8
 
+#define CIGI_MOTION_TRACK_CTRL_PACKET_ID_V4 0x11
+#define CIGI_MOTION_TRACK_CTRL_PACKET_SIZE_V4 16
+
 
 class CigiMotionTrackCtrlV1;
 class CigiMotionTrackCtrlV2;
 class CigiMotionTrackCtrlV3;
+class CigiMotionTrackCtrlV4;
 
 
 class CIGI_SPEC CigiBaseMotionTrackCtrl : public CigiBasePacket
@@ -76,6 +82,7 @@ class CIGI_SPEC CigiBaseMotionTrackCtrl : public CigiBasePacket
 friend class CigiMotionTrackCtrlV1;
 friend class CigiMotionTrackCtrlV2;
 friend class CigiMotionTrackCtrlV3;
+friend class CigiMotionTrackCtrlV4;
 
 public:
 

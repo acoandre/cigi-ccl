@@ -70,10 +70,14 @@
 #define CIGI_TRAJECTORY_DEF_PACKET_ID_V3 20
 #define CIGI_TRAJECTORY_DEF_PACKET_SIZE_V3 24
 
+#define CIGI_ACCELERATION_CTRL_PACKET_ID_V4 0x13
+#define CIGI_ACCELERATION_CTRL_PACKET_SIZE_V4 32
+
 
 class CigiTrajectoryDefV1;
 class CigiTrajectoryDefV2;
 class CigiTrajectoryDefV3;
+class CigiAccelerationCtrlV4;
 
 
 class CIGI_SPEC CigiBaseTrajectoryDef : public CigiBasePacket
@@ -82,8 +86,18 @@ class CIGI_SPEC CigiBaseTrajectoryDef : public CigiBasePacket
 friend class CigiTrajectoryDefV1;
 friend class CigiTrajectoryDefV2;
 friend class CigiTrajectoryDefV3;
+friend class CigiAccelerationCtrlV4;
 
 public:
+
+    //=========================================================
+    //! The enumeration for the CigiBaseAccelerationCtrl Group
+    //!
+    enum CoordGrp
+    {
+	World = 0, // Parent
+	Local = 1
+    };
 
    //==> Management
 
@@ -138,8 +152,8 @@ public:
    //! \return This returns CIGI_SUCCESS or an error code 
    //!   defined in CigiErrorCodes.h
    //!
-	virtual int GetCnvt(CigiVersionID &CnvtVersion,
-                       CigiCnvtInfoType::Type &CnvtInfo);
+    virtual int GetCnvt(CigiVersionID &CnvtVersion,
+                    CigiCnvtInfoType::Type &CnvtInfo);
 
 
 
@@ -186,6 +200,27 @@ public:
    //! \return the current RetardationRate.
    float GetRetardationRate(void) const { return(RetardationRate); }
 
+   //+> Accel
+
+   //=========================================================
+   //! Sets the Accel with bound checking control
+   //! \param AccelIn - Acceleration value.
+   //! \param bndchk - Enables (true) or disables (false) bounds checking.
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code
+   //!   defined in CigiErrorCodes.h
+   int SetAccel(const float AccelIn, bool bndchk = true)
+   {
+       Accel = AccelIn;
+       AccelZ = Accel;
+       return(CIGI_SUCCESS);
+   }
+
+   //=========================================================
+   //! Gets the Accel value.
+   //! \return the current Accel.
+   float GetAccel(void) const { return(Accel); }
+
 
    //+> TermVel
 
@@ -214,11 +249,30 @@ protected:
    //==> Member variables
 
    //=========================================================
+   //! CoordSys<br>
+   //! Specified the reference coordinate system to which
+   //! accelerations are appied.
+   //!
+    CoordGrp CoordSys;
+
+    //=========================================================
+    //! ArtPartApplyEn<br>
+    //! Enable articulated part accelerations
+    //!
+    bool ArtPartApplyEn;
+
+   //=========================================================
    //! EntityID<br>
    //! Uniquely identifies the entity to which this packet 
    //!   is applied.
    //!
    Cigi_uint16 EntityID;
+
+   //=========================================================
+   //! ArtPartID<br>
+   //! Articulated Part ID to which the accelerations are applied
+   //!
+   Cigi_uint8 ArtPartID;
 
    //=========================================================
    //! Accel<br>
@@ -276,6 +330,28 @@ protected:
    //! The acceleration along the Z (Down) axis
    //!
    float AccelZ;
+
+   //=========================================================
+   //! AccelRoll<br>
+   //! The angular acceleration around the Y (East) axis
+   //!
+   //!
+   float AccelRoll;
+
+   //=========================================================
+   //! AccelPitch<br>
+   //! The angular acceleration around the X (North) axis
+   //!
+   //!
+   float AccelPitch;
+
+   //=========================================================
+   //! AccelYaw<br>
+   //! The angular acceleration around the Z (Down) axis
+   //!
+   //!
+   float AccelYaw;
+
 
 
 

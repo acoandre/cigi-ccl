@@ -37,6 +37,9 @@
  *  04/14/2006 Greg Basler                       Version 1.7.0
  *  Modified the class constructor to set the outgoing message in the VJmp 
  *  member variable.
+ *
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -58,7 +61,7 @@ CigiSession::CigiSession(const int NumInBuf, const int InBufLen,
                          SessionTypeEnum SessionTypeIn) : 
    SessionType( SessionTypeIn ),
    Synchronous( true ),
-   MostMatureKnownCigi(3,3)
+   MostMatureKnownCigi(4,0) // chas
 {
 
    CigiVersionID InitVersion = MostMatureKnownCigi;

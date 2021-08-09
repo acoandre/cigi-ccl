@@ -133,8 +133,8 @@ int CigiSensorRespV2::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec)
 
    CDta.d = DBuf;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    Cigi_uint8 HDta = (Cigi_uint8)((Data->ViewID << 3) & 0x00f8);
    HDta |= (Cigi_uint8)((Data->SensorStat << 1) & 0x06);

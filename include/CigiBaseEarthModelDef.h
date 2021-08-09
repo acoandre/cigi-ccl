@@ -43,6 +43,9 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -61,14 +64,18 @@
 #define CIGI_EARTH_MODEL_DEF_PACKET_ID_V3 19
 #define CIGI_EARTH_MODEL_DEF_PACKET_SIZE_V3 24
 
+#define CIGI_EARTH_MODEL_DEF_PACKET_ID_V4 0x12
+#define CIGI_EARTH_MODEL_DEF_PACKET_SIZE_V4 24
 
 class CigiEarthModelDefV3;
+class CigiEarthModelDefV4;
 
 
 class CIGI_SPEC CigiBaseEarthModelDef : public CigiBasePacket
 {
 
 friend class CigiEarthModelDefV3;
+friend class CigiEarthModelDefV4;
 
 public:
 
@@ -77,12 +84,12 @@ public:
    //=========================================================
    //! General Constructor
    //!
-   CigiBaseEarthModelDef() { };
+   CigiBaseEarthModelDef();
 
    //=========================================================
    //! General Destructor
    //!
-   virtual ~CigiBaseEarthModelDef() { };
+   virtual ~CigiBaseEarthModelDef();
 
 
    //==> Buffer Packing/Unpacking
@@ -125,21 +132,7 @@ public:
    //!   defined in CigiErrorCodes.h
    //!
 	virtual int GetCnvt(CigiVersionID &CnvtVersion,
-                       CigiCnvtInfoType::Type &CnvtInfo)
-   {
-      if(CnvtVersion.CigiMajorVersion < 3)
-      {
-         CnvtInfo.ProcID = CigiProcessType::ProcNone;
-         CnvtInfo.CnvtPacketID = 0;
-      }
-      else
-      {
-         CnvtInfo.ProcID = CigiProcessType::ProcStd;
-         CnvtInfo.CnvtPacketID = CIGI_EARTH_MODEL_DEF_PACKET_ID_V3;
-      }
-
-      return(CIGI_SUCCESS);
-   }
+                       CigiCnvtInfoType::Type &CnvtInfo);
 
 
 

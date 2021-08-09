@@ -64,14 +64,19 @@
 #define CIGI_TERRESTRIAL_SURFACE_RESP_PACKET_ID_V3 112
 #define CIGI_TERRESTRIAL_SURFACE_RESP_PACKET_SIZE_V3 8
 
+#define CIGI_TERRESTRIAL_SURFACE_RESP_PACKET_ID_V4 0x0ff5
+#define CIGI_TERRESTRIAL_SURFACE_RESP_PACKET_SIZE_V4 16
+
 
 class CigiTerrestrialSurfaceRespV3;
+class CigiTerrestrialSurfaceRespV4;
 
 
 class CIGI_SPEC CigiBaseTerrestrialSurfaceResp : public CigiBasePacket
 {
 
 friend class CigiTerrestrialSurfaceRespV3;
+friend class CigiTerrestrialSurfaceRespV4;
 
 public:
 
@@ -137,10 +142,15 @@ public:
          CnvtInfo.ProcID = CigiProcessType::ProcNone;
          CnvtInfo.CnvtPacketID = 0;
       }
-      else
+      else if(CnvtVersion.CigiMajorVersion < 4)
       {
          CnvtInfo.ProcID = CigiProcessType::ProcStd;
          CnvtInfo.CnvtPacketID = CIGI_TERRESTRIAL_SURFACE_RESP_PACKET_ID_V3;
+      }
+      else
+      {
+         CnvtInfo.ProcID = CigiProcessType::ProcStd;
+         CnvtInfo.CnvtPacketID = CIGI_TERRESTRIAL_SURFACE_RESP_PACKET_ID_V4;
       }
 
       return(CIGI_SUCCESS);

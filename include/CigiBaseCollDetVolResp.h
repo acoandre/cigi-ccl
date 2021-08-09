@@ -67,9 +67,13 @@
 #define CIGI_COLL_DET_VOL_RESP_PACKET_ID_V3 114
 #define CIGI_COLL_DET_VOL_RESP_PACKET_SIZE_V3 16
 
+#define CIGI_COLL_DET_VOL_RESP_PACKET_ID_V4 0x0ff3
+#define CIGI_COLL_DET_VOL_RESP_PACKET_SIZE_V4 16
+
 
 class CigiCollDetVolRespV2;
 class CigiCollDetVolRespV3;
+class CigiCollDetVolRespV4;
 
 
 class CIGI_SPEC CigiBaseCollDetVolResp : public CigiBasePacket
@@ -77,6 +81,7 @@ class CIGI_SPEC CigiBaseCollDetVolResp : public CigiBasePacket
 
 friend class CigiCollDetVolRespV2;
 friend class CigiCollDetVolRespV3;
+friend class CigiCollDetVolRespV4;
 
 public:
 

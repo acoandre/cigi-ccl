@@ -53,6 +53,11 @@
  *  Initial Release.
  *  Split types file into specific architecture types files.,
  *
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *  Initial Release. Modified CCL_MAJOR_VERSION, CCL_MINOR_VERSION
+ *  and CCL_PATCH_LEVEL to reflect new release.
+ *  
+ *
  * </pre>
  *  Author: The Boeing Company
  */
@@ -62,8 +67,8 @@
 #define CIGI_TYPES_H
 
 
-#define CCL_MAJOR_VERSION 3
-#define CCL_MINOR_VERSION 3
+#define CCL_MAJOR_VERSION 4
+#define CCL_MINOR_VERSION 0
 #define CCL_PATCH_LEVEL   0
 
 

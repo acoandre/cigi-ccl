@@ -50,6 +50,12 @@
  *  Added Extrapolation or Interpolation Smoothing flag.
  *  Added the defines and declarations for V3_3.
  *  
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *
+ *  12/13/2018 Paul Slade                       Version 4.0.2
+ *  Fixes required to allow correct version conversion
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -78,11 +84,15 @@
 #define CIGI_ENTITY_CTRL_PACKET_ID_V3_3 2
 #define CIGI_ENTITY_CTRL_PACKET_SIZE_V3_3 48
 
+#define CIGI_ENTITY_CTRL_PACKET_ID_V4 0x25
+#define CIGI_ENTITY_CTRL_PACKET_SIZE_V4 16
+
 
 class CigiEntityCtrlV1;
 class CigiEntityCtrlV2;
 class CigiEntityCtrlV3;
 class CigiEntityCtrlV3_3;
+class CigiEntityCtrlV4;
 
 
 //=========================================================
@@ -95,6 +105,7 @@ friend class CigiEntityCtrlV1;
 friend class CigiEntityCtrlV2;
 friend class CigiEntityCtrlV3;
 friend class CigiEntityCtrlV3_3;
+friend class CigiEntityCtrlV4;
 
 public:
 
@@ -105,7 +116,8 @@ public:
    {
       Standby=0,
       Active=1,
-      Remove=2
+      Remove=2,
+      Destroyed=2
    };
 
    //=========================================================
@@ -181,6 +193,15 @@ public:
       DeactivateUnload=9
    };
 
+
+   //=========================================================
+   //! The enumeration for the Entity State flag
+   //!
+   enum ExtendedEntityTypeGrp
+   {
+       Short = 0,
+       Extended = 1
+   };
 
 
    //==> Management
@@ -296,31 +317,6 @@ public:
    Cigi_uint16 GetEntityType(void) const { return(EntityType); }
 
 
-   //+> Attach State Flag
-
-   //=========================================================
-   //! Sets the Attach State Flag with bound checking control
-   //! \param AttachStateIn - Specifies whether this entity is independant
-   //!   or attached to a parent entity.
-   //!   0 Detach   (independent)
-   //!   1 Attach
-   //! \param bndchk - Enables (true) or disables (false) bounds checking
-   //!
-   //! \return This returns CIGI_SUCCESS or an error code 
-   //!   defined in CigiErrorCodes.h
-   //!
-	int SetAttachState(const AttachStateGrp AttachStateIn, bool bndchk=true);
-
-   //=========================================================
-   //! Gets the Attach State Flag value
-   //! \return AttachState specifies whether this entity is independant
-   //!   or attached to a parent entity.
-   //!   0 Detach
-   //!   1 Attach
-   //!
-   AttachStateGrp GetAttachState(void) const { return(AttachState); }
-
-
    //+> Collision Detection Enable Flag
 
    //=========================================================
@@ -347,167 +343,6 @@ public:
    CollisionDetectGrp GetCollisionDetectEn(void) const { return(CollisionDetectEn); }
 
 
-   //+> Parent ID
-
-   //=========================================================
-   //! Sets the Parent ID with bound checking control
-   //! \param ParentIDIn - If this is an attached entity,
-   //!   this specifies to which entity this entity is attached.
-   //! \param bndchk - Enables (true) or disables (false) bounds checking
-   //!
-   //! \return This returns CIGI_SUCCESS or an error code 
-   //!   defined in CigiErrorCodes.h
-   //!
-	int SetParentID(const Cigi_uint16 ParentIDIn, bool bndchk=true)
-   {
-      ParentID = ParentIDIn;
-      return(CIGI_SUCCESS);
-   }
-
-   //=========================================================
-   //! Gets the Parent ID value
-   //! \return ParentID specifies to which entity this entity is attached,
-   //!   if this is an attached entity.
-   //!
-   Cigi_uint16 GetParentID(void) const { return(ParentID); }
-
-
-   //+> Pitch
-
-   //=========================================================
-   //! Sets the Pitch with bound checking control
-   //! \param PitchIn - Specifies the pitch of the entity
-   //!   (-90.0 to +90.0)
-   //! \param bndchk - Enables (true) or disables (false) bounds checking
-   //!
-   //! \return This returns CIGI_SUCCESS or an error code 
-   //!   defined in CigiErrorCodes.h
-   //!
-	int SetPitch(const float PitchIn, bool bndchk=true);
-
-   //=========================================================
-   //! Gets the Pitch value
-   //! \return Pitch specifies the pitch of the entity
-   //!   (-90.0 to +90.0)
-   //!
-   float GetPitch(void) const { return(Pitch); }
-
-
-   //+> Roll
-
-   //=========================================================
-   //! Sets the Roll with bound checking control
-   //! \param RollIn - Specifies the roll of the entity
-   //!   (-180.0 to +180.0)
-   //! \param bndchk - Enables (true) or disables (false) bounds checking
-   //!
-   //! \return This returns CIGI_SUCCESS or an error code 
-   //!   defined in CigiErrorCodes.h
-   //!
-	int SetRoll(const float RollIn, bool bndchk=true);
-
-   //=========================================================
-   //! Gets the Roll value
-   //! \return Roll specifies the roll of the entity
-   //!   (-180.0 to +180.0)
-   //!
-   float GetRoll(void) const { return(Roll); }
-
-
-   //+> Latitude
-
-   //=========================================================
-   //! Sets the Latitude with bound checking control
-   //! \param Lat - Specifies the Latitude of the entity
-   //!   (-90.0 to +90.0)
-   //! \param bndchk - Enables (true) or disables (false) bounds checking
-   //!
-   //! \return This returns CIGI_SUCCESS or an error code 
-   //!   defined in CigiErrorCodes.h
-   //!
-	int SetLat(const double Lat, bool bndchk=true);
-
-   //=========================================================
-   //! Gets the Latitude value
-   //! \return LatOrXoff specifies the Latitude of the entity
-   //!   (-90.0 to +90.0)
-   //!
-   double GetLat(void) const { return(LatOrXoff); }
-
-
-   //+> X Offset
-
-   //=========================================================
-   //! Sets the X Offset with bound checking control
-   //! \param Xoff - Specifies the X axis Offset from 
-   //!   the Parent entity's origin.
-   //! \param bndchk - Enables (true) or disables (false) bounds checking
-   //!
-   //! \return This returns CIGI_SUCCESS or an error code 
-   //!   defined in CigiErrorCodes.h
-   //!
-	int SetXoff(const double Xoff,bool bndchk=true)
-   {
-      LatOrXoff = Xoff;
-      return(CIGI_SUCCESS);
-   }
-
-   //=========================================================
-   //! Gets the X Offset value
-   //! \return LatOrXoff specifies the X axis Offset from 
-   //!   the Parent entity's origin.
-   //!
-	double GetXoff(void) const { return(LatOrXoff); }
-
-
-   //+> Longitude
-
-   //=========================================================
-   //! Sets the Longitude with bound checking control
-   //! \param Lon - Specifies the Longitude of the entity
-   //!   (-180.0 to +180.0)
-   //! \param bndchk - Enables (true) or disables (false) bounds checking
-   //!
-   //! \return This returns CIGI_SUCCESS or an error code 
-   //!   defined in CigiErrorCodes.h
-   //!
-	int SetLon(const double Lon, bool bndchk=true);
-
-   //=========================================================
-   //! Getting the Longitude value
-   //! \return LonOrYoff specifies the Longitude of the entity
-   //!   (-180.0 to +180.0)
-   //!
-   double GetLon(void) const { return(LonOrYoff); }
-
-
-   //+> Y Offset
-
-   //=========================================================
-   //! Sets the Y Offset with bound checking control
-   //! \param Yoff - Specifies the Y axis Offset from 
-   //!   the Parent entity's origin.
-   //! \param bndchk - Enables (true) or disables (false) bounds checking
-   //!
-   //! \return This returns CIGI_SUCCESS or an error code 
-   //!   defined in CigiErrorCodes.h
-   //!
-	int SetYoff(const double Yoff, bool bndchk=true)
-   {
-      LonOrYoff = Yoff;
-      return(CIGI_SUCCESS);
-   }
-
-   //=========================================================
-   //! Gets the Y Offset value
-   //! \return LonOrYoff specifies the Y axis Offset from 
-   //!   the Parent entity's origin.
-   //!
-	double GetYoff(void) const { return(LonOrYoff); }
-
-
-
-
 protected:
 
    //==> Member variables
@@ -524,6 +359,8 @@ protected:
    //! Entity Type<br>
    //! Specifies the type of entity this is<br>
    //!   The entity types are specified by the using systems
+   //!  For Cigi4 instead stores the EntityCountry when
+   //!  extended types are used
    //!
 	Cigi_uint16 EntityType;
 
@@ -546,62 +383,6 @@ protected:
    //! Percent visible: 0 - transparent : 100.0 - Fully visible
 	float Opacity;
 
-   //=========================================================
-   //! Temperature<br>
-   //! Specifies the internal temperature of the entity
-   //!   in degrees Celsius.
-   //!
-	float Temperature;
-
-   //=========================================================
-   //! Roll
-   //! Specifies the roll of the entity<br>
-   //!   (-180.0 to +180.0)
-   //!
-	float Roll;
-
-   //=========================================================
-   //! Pitch
-   //! Specifies the pitch of the entity<br>
-   //!   (-90.0 to +90.0)
-   //!
-	float Pitch;
-
-   //=========================================================
-   //! Yaw
-   //! Specifies the Yaw or Heading of the entity<br>
-   //!   (0.0 to 360.0)
-	float Yaw;
-
-   //=========================================================
-   //! Latitude or X Offset from parent entity origin<br>
-   //! Specifies the latitude or X Offset from parent entity origin<br>
-   //!   (-90.0 to +90.0 if latitude)<br>
-   //!   no bounds if X Offset
-   //!
-	double LatOrXoff;
-
-   //=========================================================
-   //! Longitude or Y Offset from parent entity origin<br>
-   //! Specifies the longitude or Y Offset from parent entity origin<br>
-   //!   (-180.0 to +180.0 if longitude)<br>
-   //!   no bounds if Y Offset
-   //!
-	double LonOrYoff;
-
-   //=========================================================
-   //! Altitude or Z Offset from parent entity origin.<br>
-   //! Specifies the longitude or Z Offset from parent entity origin<br>
-   //!   (no bounds)
-   //!
-	double AltOrZoff;
-
-
-   //==> Conversion Tables
-   
-   static const AnimationStateGrp ToV1[10];
-   static const AnimationStateGrp ToV3[10];
-
 
    //==> Member flags
 
@@ -612,13 +393,6 @@ protected:
    //! 2 Destroy<br>
    //!
 	EntityStateGrp EntityState;
-
-   //=========================================================
-   //! Attach State<br>
-   //! 0 Detach<br>
-   //! 1 Attach<br>
-   //!
-   AttachStateGrp AttachState;
 
    //=========================================================
    //! Collision Detection Enable<br>
@@ -635,26 +409,27 @@ protected:
 	InheritAlphaGrp InheritAlpha;
 
    //=========================================================
-   //! Ground/Ocean Clamp<br>
-   //! 0 Clamp<br>
-   //! 1 Altitude clamp<br>
-   //! 2 Altitude and Orientation clamp
+   //! Smoothing Enabled<br>
+   //!  Enable or Disable Extrapolation or Interpolation
+   //!    motion smoothing.
+   //!  true - Smoothing is Enabled<br>
+   //!  false - Smoothing is Disabled.
    //!
-	GrndClampGrp GrndClamp;
+   bool SmoothingEn;
 
    //=========================================================
    //! Animation Direction<br>
    //! 0 Forward<br>
    //! 1 Backward<br>
    //!
-	AnimationDirGrp AnimationDir;
+   AnimationDirGrp AnimationDir;
 
    //=========================================================
    //! Animation Loop Mode<br>
    //! 0 One-Shot<br>
    //! 1 Continuous<br>
    //!
-	AnimationLoopModeGrp AnimationLoopMode;
+   AnimationLoopModeGrp AnimationLoopMode;
 
    //=========================================================
    //! Animation State<br>
@@ -669,7 +444,7 @@ protected:
    //! 8 Deactivate<br>
    //! 9 DeactivateUnload<br>
    //!
-	AnimationStateGrp AnimationState;
+   AnimationStateGrp AnimationState;
 
    //=========================================================
    //! Past Animation State<br>
@@ -688,13 +463,121 @@ protected:
    AnimationStateGrp PastAnimationState;
 
    //=========================================================
-   //! Smoothing Enabled<br>
-   //!  Enable or Disable Extrapolation or Interpolation
-   //!    motion smoothing.
-   //!  true - Smoothing is Enabled<br>
-   //!  false - Smoothing is Disabled.
+   //! Ground/Ocean Clamp<br>
+   //! 0 Clamp<br>
+   //! 1 Altitude clamp<br>
+   //! 2 Altitude and Orientation clamp
    //!
-   bool SmoothingEn;
+   GrndClampGrp GrndClamp;
+
+   //=========================================================
+   //! Attach State<br>
+   //! 0 Detach<br>
+   //! 1 Attach<br>
+   //!
+   AttachStateGrp AttachState;
+
+   //=========================================================
+   //! Temperature<br>
+   //! Specifies the internal temperature of the entity
+   //!   in degrees Celsius.
+   //!
+   float Temperature;
+
+   //=========================================================
+   //! Roll
+   //! Specifies the roll of the entity<br>
+   //!   (-180.0 to +180.0)
+   //!
+   float Roll;
+
+   //=========================================================
+   //! Pitch
+   //! Specifies the pitch of the entity<br>
+   //!   (-90.0 to +90.0)
+   //!
+   float Pitch;
+
+   //=========================================================
+   //! Yaw
+   //! Specifies the Yaw or Heading of the entity<br>
+   //!   (0.0 to 360.0)
+   float Yaw;
+
+   //=========================================================
+   //! Latitude or X Offset from parent entity origin<br>
+   //! Specifies the latitude or X Offset from parent entity origin<br>
+   //!   (-90.0 to +90.0 if latitude)<br>
+   //!   no bounds if X Offset
+   //!
+   double LatOrXoff;
+
+   //=========================================================
+   //! Longitude or Y Offset from parent entity origin<br>
+   //! Specifies the longitude or Y Offset from parent entity origin<br>
+   //!   (-180.0 to +180.0 if longitude)<br>
+   //!   no bounds if Y Offset
+   //!
+   double LonOrYoff;
+
+   //=========================================================
+   //! Altitude or Z Offset from parent entity origin.<br>
+   //! Specifies the longitude or Z Offset from parent entity origin<br>
+   //!   (no bounds)
+   //!
+   double AltOrZoff;
+
+
+   //=========================================================
+   //! ExtenedEntityType<br>
+   //! Specifies the extended type of this entity<br>
+   //!   0 Short
+   //!   1 Extended
+   //!
+   ExtendedEntityTypeGrp ExtendedEntityType;
+
+
+   //=========================================================
+   //! EntityKind<br>
+   //! Identifies the kind of entity<br>
+   //!
+   Cigi_uint8 EntityKind;
+
+   //=========================================================
+   //! EntityDomain<br>
+   //! Identifies the domain of entity<br>
+   //!
+   Cigi_uint8 EntityDomain;
+
+
+   //=========================================================
+   //! EntityCategory<br>
+   //! Identifies the cayegory of entity<br>
+   //!
+   Cigi_uint8 EntityCategory;
+
+   //=========================================================
+   //! EntitySubcategory<br>
+   //! Identifies the subcategory of entity<br>
+   //!
+   Cigi_uint8 EntitySubcategory;
+
+   //=========================================================
+   //! EntitySpecific<br>
+   //! Identifies the entiyu specifics of entity<br>
+   //!
+   Cigi_uint8 EntitySpecific;
+
+   //=========================================================
+   //! EntityExtra<br>
+   //! Identifies the entity extras of entity<br>
+   //!
+   Cigi_uint8 EntityExtra;
+
+   //==> Conversion Tables
+
+   static const AnimationStateGrp ToV1[10];
+   static const AnimationStateGrp ToV3[10];
 
 };
 

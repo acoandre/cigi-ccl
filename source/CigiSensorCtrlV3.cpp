@@ -114,8 +114,8 @@ int CigiSensorCtrlV3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec)
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    *CDta.s++ = Data->ViewID;
    *CDta.c++ = Data->SensorID;

@@ -31,6 +31,8 @@
  *  03/11/2008 Greg Basler                       CIGI_SYM_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -75,15 +77,20 @@ CigiBaseSymbolSurfaceDef::~CigiBaseSymbolSurfaceDef(void)
 int CigiBaseSymbolSurfaceDef::GetCnvt(CigiVersionID &CnvtVersion,
                                       CigiCnvtInfoType::Type &CnvtInfo)
 {
-   if(CnvtVersion.GetCombinedCigiVersion() < 0x303)
+   if(CnvtVersion.CigiMajorVersion < 3)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcNone;
       CnvtInfo.CnvtPacketID = 0;
    }
-   else
+   else if(CnvtVersion.CigiMajorVersion < 4)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcStd;
       CnvtInfo.CnvtPacketID = CIGI_SYMBOL_SURFACE_DEF_PACKET_ID_V3_3;
+   }
+   else
+   {
+      CnvtInfo.ProcID = CigiProcessType::ProcStd;
+      CnvtInfo.CnvtPacketID = CIGI_SYMBOL_SURFACE_DEF_PACKET_ID_V4;
    }
 
    return(CIGI_SUCCESS);

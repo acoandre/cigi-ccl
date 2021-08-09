@@ -44,7 +44,10 @@
  *  
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Moved Packet information to base packet.
- *  
+ *
+ *  01/23/2019 Paul Slade                       Version 4.0.2
+ *  Added GetCnvt() to allow conversion between V3 and V4
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -79,7 +82,7 @@ public:
    //==> Buffer Packing/Unpacking
 
    //=========================================================
-   //! The virtual Pack function for CIGI 3
+   //! The virtual Pack function for CIGI 4
    //! \param Base - A pointer to the instance of the packet 
    //!          to be packed. (Downcast to CigiBasePacket)
    //! \param Buff - A pointer to the current pack point.
@@ -93,7 +96,7 @@ public:
    //!
    virtual int Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) const;
    //=========================================================
-   //! The virtual Unpack function for CIGI 3
+   //! The virtual Unpack function for CIGI 4
    //! \param Buff - A pointer to the current pack point.
    //! \param Swap - N/A for V1 & V2
    //! \param Spec - A pointer to special data -
@@ -105,6 +108,21 @@ public:
    //!
    virtual int Unpack(Cigi_uint8 * Buff, bool Swap, void *Spec);
 
+
+   //=========================================================
+   //! A virtual Conversion Information function.
+   //! This function provides conversion information for this
+   //!  packet.
+   //! \param CnvtVersion - The CIGI version to which this packet
+   //!    is being converted.
+   //! \param CnvtInfo - The information needed for conversion
+   //!    
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+   virtual int GetCnvt(CigiVersionID &CnvtVersion,
+       CigiCnvtInfoType::Type &CnvtInfo);
 
    //==> Hold Object Manipulation
 

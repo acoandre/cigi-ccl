@@ -96,6 +96,9 @@ CigiSOFV1::CigiSOFV1()
    TimestampValid = false;
    EarthRefModel = WGS84;
    LastRcvdHostFrame = 0;
+   OverframingCondition = 0;
+   PagingCondition = 0;
+   ExcessVarLenDataCondition = 0;
 
 }
 
@@ -125,8 +128,8 @@ int CigiSOFV1::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) const
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
    *CDta.c++ = Version;
 
    *CDta.b++ = Data->DatabaseID;

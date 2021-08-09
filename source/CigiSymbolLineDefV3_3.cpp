@@ -174,7 +174,7 @@ int CigiSymbolLineDefV3_3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
    *CDta.c++ = (PacketSize + Data->VariableDataSize);
 
    *CDta.s++ = Data->SymbolID;
@@ -282,7 +282,7 @@ int CigiSymbolLineDefV3_3::Unpack(Cigi_uint8 * Buff, bool Swap, void *Spec)
 CigiBaseVertexSymbolData * CigiSymbolLineDefV3_3::AddVertex(void)
 {
    CigiVertexSymbolDataV3_3 *NewVertex = NULL;
-   int Cnt = Vertices.size();
+   int Cnt = (int)Vertices.size();
 
    if(Cnt < 29)
    {
@@ -301,7 +301,7 @@ int CigiSymbolLineDefV3_3::RemoveVertex(int VertexIndex, bool bndchk)
 {
    int stat = CIGI_SUCCESS;
 
-   int Cnt = Vertices.size();
+   int Cnt = (int)Vertices.size();
 
    if((VertexIndex >= 0) && (VertexIndex < Cnt))
    {
