@@ -6,7 +6,7 @@
 #define _PROC_XCollDetSegDef_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiCollDetSegDefV3.h"
+#include "CigiCollDetSegDefV4.h"
 
 class XCollDetSegDef : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiCollDetSegDefV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiCollDetSegDefV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiCollDetSegDefV3 *TPckt;
+   CigiCollDetSegDefV4 *TPckt;
 
 };
 

@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,15 +66,21 @@
 #define CIGI_SHORT_ART_PART_CTRL_PACKET_ID_V3 7
 #define CIGI_SHORT_ART_PART_CTRL_PACKET_SIZE_V3 16
 
+#define CIGI_SHORT_ART_PART_CTRL_PACKET_ID_V4 0x06
+#define CIGI_SHORT_ART_PART_CTRL_PACKET_SIZE_V4 24
+
 
 class CigiShortArtPartCtrlV3;
 class CigiArtPartCtrlV3;
+class CigiShortArtPartCtrlV4;
+class CigiArtPartCtrlV4;
 
 
 class CIGI_SPEC CigiBaseShortArtPartCtrl : public CigiBasePacket
 {
 
 friend class CigiShortArtPartCtrlV3;
+friend class CigiShortArtPartCtrlV4;
 
 public:
 
@@ -166,6 +174,25 @@ public:
 	int SpecialConversion(CigiVersionID &CnvtVersion,
                          Cigi_uint8 ArtPartID,
                          CigiArtPartCtrlV3 *ArtPart);
+
+   //=========================================================
+   //! A virtual Conversion Information function.
+   //! This function provides conversion information for this
+   //!  packet.
+   //! \param CnvtVersion - The CIGI version to which this packet
+   //!    is being converted.
+   //! \param ArtPartID - The ID of the Articulated Part to
+   //!    process.
+   //! \param ArtPart - The Articulated Part Control Packet
+   //!    object to fill.
+   //!    
+   //!
+   //! \return This returns CIGI_SUCCESS or an error code 
+   //!   defined in CigiErrorCodes.h
+   //!
+	int SpecialConversion(CigiVersionID &CnvtVersion,
+                         Cigi_uint8 ArtPartID,
+                         CigiArtPartCtrlV4 *ArtPart);
 
 
 

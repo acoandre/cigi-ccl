@@ -23,27 +23,46 @@ XLosSegReq::~XLosSegReq()
 
 void XLosSegReq::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiLosSegReqV3_2 *InPckt = (CigiLosSegReqV3_2 *)Packet;
+   CigiLosSegReqV4 *InPckt = (CigiLosSegReqV4 *)Packet;
 
    printf("===> LosSegReq <===\n");
 
+   printf("Source Entity ID ==> %d\n",InPckt->GetEntityID());
+   printf("Destination Entity ID ==> %d\n",InPckt->GetDestEntityID());
    printf("LosID ==> %d\n",InPckt->GetLosID());
-   printf("ReqType ==> %d\n",InPckt->GetReqType());
-   printf("SrcCoordSys ==> %d\n",InPckt->GetSrcCoordSys());
-   printf("DstCoordSys ==> %d\n",InPckt->GetDstCoordSys());
-   printf("ResponseCoordSys ==> %d\n",InPckt->GetResponseCoordSys());
-   printf("DestinationEntityValid ==> %d\n",InPckt->GetDestEntityIDValid());
-   printf("AlphaThresh ==> %d\n",InPckt->GetAlphaThresh());
-   printf("EntityID ==> %d\n",InPckt->GetEntityID());
+	if( InPckt->GetReqType() == 0 )
+	   printf("ReqType ==> 0: Basic\n" );
+	else if( InPckt->GetReqType() == 1 )
+	   printf("ReqType ==> 1: Extended\n" );
+
+	if( InPckt->GetResponseCoordSys() == 0 )
+	   printf("Response Coord Sys ==> 0: Geodetic\n" );
+	else if( InPckt->GetResponseCoordSys() == 1 )
+	   printf("Response Coord Sys ==> 1: Entity\n" );
+
+   printf("UpdatePeriod ==> %d\n",InPckt->GetUpdatePeriod());
+
    printf("SrcXoff ==> %f\n",InPckt->GetSrcXoff());
    printf("SrcYoff ==> %f\n",InPckt->GetSrcYoff());
    printf("SrcZoff ==> %f\n",InPckt->GetSrcZoff());
+	if( InPckt->GetSrcCoordSys() == 0 )
+	   printf("Source Coord Sys ==> 0: Geodetic\n" );
+	else if( InPckt->GetSrcCoordSys() == 1 )
+	   printf("Source Coord Sys ==> 1: Entity\n" );
+
+
    printf("DstXoff ==> %f\n",InPckt->GetDstXoff());
    printf("DstYoff ==> %f\n",InPckt->GetDstYoff());
    printf("DstZoff ==> %f\n",InPckt->GetDstZoff());
+	if( InPckt->GetDstCoordSys() == 0 )
+	   printf("Destination Coord Sys ==> 0: Geodetic\n" );
+	else if( InPckt->GetDstCoordSys() == 1 )
+	   printf("Destination Coord Sys ==> 1: Entity\n" );
+
+   printf("DestinationEntityValid ==> %d\n",InPckt->GetDestEntityIDValid());
+   printf("AlphaThresh ==> %d\n",InPckt->GetAlphaThresh());
    printf("Mask ==> %d\n",InPckt->GetMask());
    printf("UpdatePeriod ==> %d\n",InPckt->GetUpdatePeriod());
-   printf("DestinationEntityID ==> %d\n",InPckt->GetDestEntityID());
 
 
 }

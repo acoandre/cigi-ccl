@@ -23,7 +23,7 @@ XAtmosCtrl::~XAtmosCtrl()
 
 void XAtmosCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiAtmosCtrlV3 *InPckt = (CigiAtmosCtrlV3 *)Packet;
+   CigiAtmosCtrlV4 *InPckt = (CigiAtmosCtrlV4 *)Packet;
 
    printf("===> AtmosCtrl <===\n");
 

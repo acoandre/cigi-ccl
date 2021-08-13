@@ -6,7 +6,7 @@
 #define _PROC_XEnvCondReq_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiEnvCondReqV3.h"
+#include "CigiEnvCondReqV4.h"
 
 class XEnvCondReq : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiEnvCondReqV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiEnvCondReqV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiEnvCondReqV3 *TPckt;
+   CigiEnvCondReqV4 *TPckt;
 
 };
 

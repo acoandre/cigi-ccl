@@ -37,6 +37,9 @@
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Added new version conversion method.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -46,6 +49,7 @@
 
 #include "CigiBaseShortArtPartCtrl.h"
 #include "CigiArtPartCtrlV3.h"
+#include "CigiArtPartCtrlV4.h"
 #include "CigiSwapping.h"
 #include "CigiExceptions.h"
 
@@ -92,10 +96,15 @@ int CigiBaseShortArtPartCtrl::GetCnvt(CigiVersionID &CnvtVersion,
       CnvtInfo.ProcID = CigiProcessType::ProcShortArtPartToArtPart;
       CnvtInfo.CnvtPacketID = CIGI_ART_PART_CTRL_PACKET_ID_V2;
    }
-   else
+   else if(CnvtVersion.CigiMajorVersion < 4)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcStd;
       CnvtInfo.CnvtPacketID = CIGI_SHORT_ART_PART_CTRL_PACKET_ID_V3;
+   }
+   else
+   {
+      CnvtInfo.ProcID = CigiProcessType::ProcStd;
+      CnvtInfo.CnvtPacketID = CIGI_SHORT_ART_PART_CTRL_PACKET_ID_V4;
    }
 
    return(CIGI_SUCCESS);
@@ -190,6 +199,93 @@ int CigiBaseShortArtPartCtrl::SpecialConversion(CigiVersionID &CnvtVersion,
    return(CIGI_SUCCESS);
 }
 
+// ================================================
+// SpecialConversion
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int CigiBaseShortArtPartCtrl::SpecialConversion(CigiVersionID &CnvtVersion,
+   Cigi_uint8 ArtPartID, CigiArtPartCtrlV4 *ArtPart)
+{
+   if(ArtPart == NULL)
+   {
+#ifndef CIGI_NO_EXCEPT
+      throw CigiNullPointerException();
+#endif
+      return(CIGI_ERROR_UNEXPECTED_NULL);
+   }
+
+   ArtPart->SetArtPartID(ArtPartID);
+   ArtPart->SetEntityID(EntityID);
+
+   if((ArtPart1 == ArtPartID) && ArtPart1En)
+   {
+      ArtPart->SetArtPartEn(true);
+      switch(DofSelect1)
+      {
+      case Xoff:
+         ArtPart->SetXOff(Dof1);
+         ArtPart->SetXOffEn(true);
+         break;
+      case Yoff:
+         ArtPart->SetYOff(Dof1);
+         ArtPart->SetYOffEn(true);
+         break;
+      case Zoff:
+         ArtPart->SetZOff(Dof1);
+         ArtPart->SetZOffEn(true);
+         break;
+      case Yaw:
+         ArtPart->SetYaw(Dof1);
+         ArtPart->SetYawEn(true);
+         break;
+      case Pitch:
+         ArtPart->SetPitch(Dof1);
+         ArtPart->SetPitchEn(true);
+         break;
+      case Roll:
+         ArtPart->SetRoll(Dof1);
+         ArtPart->SetRollEn(true);
+         break;
+      default:
+         break;
+      }
+   }
+
+   if((ArtPart2 == ArtPartID) && ArtPart2En)
+   {
+      ArtPart->SetArtPartEn(true);
+      switch(DofSelect2)
+      {
+      case Xoff:
+         ArtPart->SetXOff(Dof2);
+         ArtPart->SetXOffEn(true);
+         break;
+      case Yoff:
+         ArtPart->SetYOff(Dof2);
+         ArtPart->SetYOffEn(true);
+         break;
+      case Zoff:
+         ArtPart->SetZOff(Dof2);
+         ArtPart->SetZOffEn(true);
+         break;
+      case Yaw:
+         ArtPart->SetYaw(Dof2);
+         ArtPart->SetYawEn(true);
+         break;
+      case Pitch:
+         ArtPart->SetPitch(Dof2);
+         ArtPart->SetPitchEn(true);
+         break;
+      case Roll:
+         ArtPart->SetRoll(Dof2);
+         ArtPart->SetRollEn(true);
+         break;
+      default:
+         break;
+      }
+   }
+
+   return(CIGI_SUCCESS);
+}
 
 // ====================================================================
 // Accessors

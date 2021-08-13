@@ -103,6 +103,18 @@
  *  database id.  Now the UpdateIGCtrl method just bounds checks the
  *  database id and corrects it to zero if needed.
  *
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *
+ *  12/07/2018 Paul Slade                       Version 4.0.2
+ *  Modified RegisterUserPacket to not return error if the packet type is just
+ *  not required by this session type
+ *  Fixed registration of V3 user defined packets
+ *
+ *  04/25/2019 Barry Folse                        Version 4.0.3
+ *  Added a lock/mutex. This dependency will be required as long as replies
+ *  can happen as a result of a call from an async thread.
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -150,26 +162,45 @@ CigiOutgoingMsg::CigiOutgoingMsg()
    pIGCtrlPck[3] = new CigiIGCtrlV3;
    pIGCtrlPck[4] = new CigiIGCtrlV3_2;
    pIGCtrlPck[5] = new CigiIGCtrlV3_3;
+   pIGCtrlPck[6] = new CigiIGCtrlV4;
 
    pSOFPck[0] = NULL;
    pSOFPck[1] = new CigiSOFV1;
    pSOFPck[2] = new CigiSOFV2;
    pSOFPck[3] = new CigiSOFV3;
    pSOFPck[4] = new CigiSOFV3_2;
+   pSOFPck[5] = new CigiSOFV4;
 
-   for(int ndx=0;ndx<256;ndx++)
+   for(int ndx=0;ndx<0xffff;ndx++)
    {
       OutgoingHandlerTbl[ndx] = (CigiBasePacket *)&DefaultPacket;
       VldSnd[ndx] = false;
    }
 
    CmdVersionChng = false;
-   CmdVersion.SetCigiVersion(3,3);
+   CmdVersion.SetCigiVersion(4,0);
    MostMatureVersionReceived.SetCigiVersion(0,0);
 
    FrameCnt = 0;
    LastRcvdFrame = 0;
 
+   // Put in by Presagis
+#ifdef _WIN32
+   InitializeCriticalSection( &m_msgLock );
+#else
+
+   pthread_mutexattr_t attr;
+   memset( &attr, 0, sizeof( attr ) );
+   pthread_mutexattr_init( &attr );
+
+   pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE_NP );
+   pthread_mutexattr_setprotocol( &attr, PTHREAD_PRIO_INHERIT );
+
+   if ( pthread_mutex_init( &m_msgLock, &attr ) != 0 )
+   {
+       printf( "CigiOutgoingMsg: error initializing mutex\n" );
+   }
+#endif
 }
 
 // ================================================
@@ -178,17 +209,25 @@ CigiOutgoingMsg::CigiOutgoingMsg()
 CigiOutgoingMsg::~CigiOutgoingMsg()
 {
    int ndx;
-   for(ndx=1;ndx<6;ndx++)
+   for(ndx=1;ndx<7;ndx++)
    {
       delete pIGCtrlPck[ndx];
    }
-   for(ndx=1;ndx<5;ndx++)
+   for(ndx=1;ndx<6;ndx++)
    {
       delete pSOFPck[ndx];
    }
 
    ClearHandlerTable();
-
+   // Put in by Presagis
+#ifdef _WIN32
+   DeleteCriticalSection( &m_msgLock );
+#else
+   if ( pthread_mutex_destroy( &m_msgLock ) != 0 )
+   {
+       printf( "CigiOutgoingMsg: error destroying mutex\n" );
+   }
+#endif
 }
 
 
@@ -238,15 +277,9 @@ void CigiOutgoingMsg::AdvanceBuffer(void)
    CrntFillBuf->Locked = false;
    CrntFillBuf->ValidIGCtrlSOF = false;
 
-   if(CmdVersionChng)
-   {
-      MostMatureVersionReceived.SetCigiVersion(0,0);
-      ChangeOutgoingCigiVersion(CmdVersion);
-      CmdVersionChng = false;
-   }
-   else if((OutgoingVersion != MostMatureVersionReceived) &&
-           (MostMatureVersionReceived.CigiMajorVersion > 0))
-      ChangeOutgoingCigiVersion(MostMatureVersionReceived);
+   if ((OutgoingVersion != MostMatureVersionReceived) &&
+       (MostMatureVersionReceived.CigiMajorVersion > 0))
+       ChangeOutgoingCigiVersion(MostMatureVersionReceived);
 
    // Set the buffer's Cigi Version
    ChangeBufferCigiVersion();
@@ -269,7 +302,9 @@ void CigiOutgoingMsg::ChangeOutgoingCigiVersion(CigiVersionID &Version)
 
       if(Session->IsHost())
       {
-         if(OutgoingVersion.CigiMajorVersion >= 3)
+         if(OutgoingVersion.CigiMajorVersion >= 4)
+            SetOutgoingHostV4Tbls();
+         else if(OutgoingVersion.CigiMajorVersion == 3)
             SetOutgoingHostV3Tbls();
          else if(OutgoingVersion.CigiMajorVersion == 2)
             SetOutgoingHostV2Tbls();
@@ -278,13 +313,21 @@ void CigiOutgoingMsg::ChangeOutgoingCigiVersion(CigiVersionID &Version)
       }
       else
       {
-         if(OutgoingVersion.CigiMajorVersion >= 3)
+         if(OutgoingVersion.CigiMajorVersion >= 4)
+            SetOutgoingIGV4Tbls();
+         else if(OutgoingVersion.CigiMajorVersion == 3)
             SetOutgoingIGV3Tbls();
          else if(OutgoingVersion.CigiMajorVersion == 2)
             SetOutgoingIGV2Tbls();
          else if(OutgoingVersion.CigiMajorVersion == 1)
             SetOutgoingIGV1Tbls();
       }
+
+      // Call back user code so it can re-register user defined extension packet classes
+      if (VersionChangeCallback() != NULL) {
+	  VersionChangeCallback()(OutgoingVersion.CigiMajorVersion, OutgoingVersion.CigiMinorVersion, VersionChangeCallbackUser());
+      }
+
    }
 }
 
@@ -316,7 +359,7 @@ void CigiOutgoingMsg::SetMostMatureReceivedCigiVersion(CigiVersionID &Version)
 
 
 // ================================================
-// SetMostMatureReceivedCigiVersion
+// SetOutgoingCigiVersion
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 int CigiOutgoingMsg::SetOutgoingCigiVersion(CigiVersionID &Version,
                                             bool bndchk)
@@ -326,21 +369,18 @@ int CigiOutgoingMsg::SetOutgoingCigiVersion(CigiVersionID &Version,
    if(Version.IsKnownCigiVersion())
    {
       MostMatureVersionReceived.SetCigiVersion(0,0);
-      CmdVersionChng = true;
-      CmdVersion = Version;
       stat = CIGI_SUCCESS;
+
+      ChangeOutgoingCigiVersion(Version);
 
       if(CrntFillBuf != NULL)
       {
          if((CrntFillBuf->Active) &&
             (!CrntFillBuf->DataPresent))
          {
-            ChangeOutgoingCigiVersion(Version);
 
             // Set the buffer's Cigi Version
             ChangeBufferCigiVersion();
-
-            CmdVersionChng = false;  // Already changed
          }
       }
    }
@@ -350,7 +390,7 @@ int CigiOutgoingMsg::SetOutgoingCigiVersion(CigiVersionID &Version,
 
 
 // ================================================
-// SetMostMatureReceivedCigiVersion
+// ChangeBufferCigiVersion
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 void CigiOutgoingMsg::ChangeBufferCigiVersion(void)
 {
@@ -360,7 +400,9 @@ void CigiOutgoingMsg::ChangeBufferCigiVersion(void)
 
    if(Session->IsHost())
    {
-      if((OutgoingVersion.GetCombinedCigiVersion() >= 0x303))
+      if((OutgoingVersion.GetCombinedCigiVersion() >= 0x0400))
+         CrntFillBuf->PackIGCtrl = pIGCtrlPck[6];
+      else if((OutgoingVersion.GetCombinedCigiVersion() >= 0x303))
          CrntFillBuf->PackIGCtrl = pIGCtrlPck[5];
       else if((OutgoingVersion.GetCombinedCigiVersion() == 0x302))
          CrntFillBuf->PackIGCtrl = pIGCtrlPck[4];
@@ -375,9 +417,10 @@ void CigiOutgoingMsg::ChangeBufferCigiVersion(void)
    }
    else
    {
-      CrntFillBuf->PackSOF =
-         pSOFPck[OutgoingVersion.CigiMajorVersion];
-      if((OutgoingVersion.GetCombinedCigiVersion() >= 0x302))
+      CrntFillBuf->PackSOF = pSOFPck[OutgoingVersion.CigiMajorVersion];
+      if((OutgoingVersion.GetCombinedCigiVersion() >= 0x0400))
+         CrntFillBuf->PackSOF = pSOFPck[5];
+      else if((OutgoingVersion.GetCombinedCigiVersion() >= 0x302))
          CrntFillBuf->PackSOF = pSOFPck[4];
 
       int pSize = CrntFillBuf->PackSOF->GetPacketSize();
@@ -750,7 +793,7 @@ CigiOutgoingMsg &  CigiOutgoingMsg::PackObj(CigiBasePacket &DataPacket,
 int CigiOutgoingMsg::UpdateFrameCntr(void)
 {
    int stat = CIGI_ERROR_UNEXPECTED_NULL;
-
+#if 0 // chas
    if(CrntMsgBuf == NULL)
    {
       if(!Buffers.empty())
@@ -766,7 +809,7 @@ int CigiOutgoingMsg::UpdateFrameCntr(void)
    }
    else
       stat = UpdateFrameCntr(CrntMsgBuf->Buffer);
-
+#endif
    return(stat);
 }
 
@@ -820,14 +863,23 @@ int CigiOutgoingMsg::UpdateFrameCntr(Cigi_uint8 *OutgoingMsg, Cigi_uint8 *Incomi
    bool FrameRcvd = false;
    CigiVersionID OutVer;
    OutVer.CigiMajorVersion = (int) *(OutgoingMsg + 2);
-   if(OutVer.CigiMajorVersion < 3)
+
+   // check if version 4 or later
+   if( ( OutVer.CigiMajorVersion == 0xff ) || 
+       ( OutVer.CigiMajorVersion == 0x00 ) )  {
+         OutVer.CigiMajorVersion = *(OutgoingMsg + 4 );
+		 OutVer.CigiMinorVersion = *(OutgoingMsg + 7 ) & 0xf0;
+         FrameIncr = true;
+         FrameRcvd = true;
+   }
+   else if(OutVer.CigiMajorVersion < 3) // check if version 1 or 2
    {
       if((Session->IsHost()) && (Session->IsSynchronous()))
          FrameRcvd = true;
       else
          FrameIncr = true;
    }
-   else
+   else // must be version 3
    {
       int tVer = 0;
       if(Session->IsHost())
@@ -862,7 +914,24 @@ int CigiOutgoingMsg::UpdateFrameCntr(Cigi_uint8 *OutgoingMsg, Cigi_uint8 *Incomi
       else
       {
          int InVer = (int) *(IncomingMsg + 2);
-         if(InVer >= 3)
+         if( ( InVer == 0xff ) || ( InVer == 0x00 ) )  					// if version 4
+         {
+			  if(Session->IsHost())
+			  {
+					if(InVer == 0xff)
+					   RcvdFrame = *(IncomingMsgWord + 2);
+					else
+					   CigiSwap4(&RcvdFrame,(IncomingMsgWord + 2));  // Swap RcvFrame
+              }
+			  else
+              {
+					if(InVer == 0x00)
+					   RcvdFrame = *(IncomingMsgWord + 2);
+					else
+					   CigiSwap4(&RcvdFrame,(IncomingMsgWord + 2));  // Swap RcvFrame
+              }
+         }
+         else if(InVer == 3)							// if version 3
          {
             // Get Byte Swap
             Cigi_uint16 *IncomingMsgShort = (Cigi_uint16 *)IncomingMsg;
@@ -871,7 +940,7 @@ int CigiOutgoingMsg::UpdateFrameCntr(Cigi_uint8 *OutgoingMsg, Cigi_uint8 *Incomi
             else
                CigiSwap4(&RcvdFrame,(IncomingMsgWord + 2));  // Swap RcvFrame
          }
-         else
+         else											// if version 1 or 2
          {
             CIGI_SCOPY4(&RcvdFrame,(IncomingMsgWord + 2));
          }
@@ -883,13 +952,24 @@ int CigiOutgoingMsg::UpdateFrameCntr(Cigi_uint8 *OutgoingMsg, Cigi_uint8 *Incomi
 
    if(OutVer.CigiMajorVersion < 3)
       CIGI_SCOPY4((OutgoingMsgWord + 2),&NewFrame);
-   else
+   else if(OutVer.CigiMajorVersion < 4)
    {
       *(OutgoingMsgWord + 2) = NewFrame;
       if(FrameIncr && FrameRcvd)
          *(OutgoingMsgWord + 4) = RcvdFrame;
    }
-
+   else
+   {
+      *(OutgoingMsgWord + 2) = NewFrame;		// new ig/host frame number
+      if(Session->IsHost())
+      {
+         *(OutgoingMsgWord + 3) = RcvdFrame;	// last ig recd number
+      }
+      else
+      {
+         *(OutgoingMsgWord + 4) = RcvdFrame;	// last host frmae number
+      }
+   }
    FrameCnt++;  // increment frame count
 
    return(CIGI_SUCCESS);
@@ -923,7 +1003,12 @@ int CigiOutgoingMsg::UpdateIGCtrl(Cigi_uint8 *OutgoingMsg, Cigi_uint8 *IncomingM
 
 
    // bounds check the Database ID
-   OBufr = (Cigi_int8 *)(OutgoingMsg + 3);
+   int OutVer = (int) *(OutgoingMsg + 2);
+   if( ( OutVer == 0xff ) ||						// if version 4 or above
+       ( OutVer == 0x00 ) )  
+         OBufr = (Cigi_int8 *)(OutgoingMsg + 5);
+   else												// else version 3 or less
+         OBufr = (Cigi_int8 *)(OutgoingMsg + 3);
    if(*OBufr < 0)
    {
       *OBufr = 0;  // Host sent Database IDs should never be negative
@@ -939,7 +1024,13 @@ int CigiOutgoingMsg::UpdateIGCtrl(Cigi_uint8 *OutgoingMsg, Cigi_uint8 *IncomingM
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 int CigiOutgoingMsg::LockMsg()
 {
-   // Check for a buffer in the Active Buffers list
+    // Put in by Presagis
+#ifdef _WIN32
+    EnterCriticalSection( &m_msgLock );
+#else
+    pthread_mutex_lock( &m_msgLock );
+#endif
+    // Check for a buffer in the Active Buffers list
    if(Buffers.empty())
    {
 #ifndef CIGI_NO_EXCEPT
@@ -997,7 +1088,7 @@ int CigiOutgoingMsg::LockMsg()
    CrntMsgBuf = ChkMsgBuf;
    CrntMsgBuf->Locked = true;
 
-   // Set up next fill buffer the CrntFillBuf and the
+   // Set up next fill buffer if the CrntFillBuf and the
    //  CrntMsgBuf are the same.
    if(CrntFillBuf == CrntMsgBuf)
       AdvanceBuffer();
@@ -1131,7 +1222,12 @@ int CigiOutgoingMsg::UnlockMsg()
 
    // Clear the Current Message Buffer
    CrntMsgBuf = NULL;
-
+   // Put in by Presagis
+#ifdef _WIN32
+   LeaveCriticalSection( &m_msgLock );
+#else
+   pthread_mutex_unlock( &m_msgLock );
+#endif
    return(CIGI_SUCCESS);
 
 }
@@ -1223,19 +1319,22 @@ int CigiOutgoingMsg::Reset(void)
 // RegisterUserPacket
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 int CigiOutgoingMsg::RegisterUserPacket(CigiBasePacket *Packet,
-                                        Cigi_uint8 PacketID,
+                                        Cigi_uint16 PacketID,
                                         bool HostSend,
                                         bool IGSend)
 {
    int stat = CIGI_ERROR_INVALID_USER_PACKET;
-   if(((PacketID > 199) && (PacketID <= 255)) &&
-      (Packet != NULL) &&
-      ((HostSend && Session->IsHost()) ||
-       (IGSend && Session->IsIG())))
+   Cigi_uint16 minUserPacketID = OutgoingVersion.CigiMajorVersion < 4 ? 201 : 0x1000;
+   Cigi_uint16 maxUserPacketID = OutgoingVersion.CigiMajorVersion < 4 ? 255 : 0xfffe;
+   if (((PacketID >= minUserPacketID) && (PacketID <= maxUserPacketID)) && (Packet != NULL))
    {
-      OutgoingHandlerTbl[PacketID] = Packet;
-      VldSnd[PacketID] = true;
-      stat = CIGI_SUCCESS;
+       stat = CIGI_SUCCESS;
+       if ((HostSend && Session->IsHost()) ||
+	   (IGSend && Session->IsIG()))
+       {
+	   OutgoingHandlerTbl[PacketID] = Packet;
+	   VldSnd[PacketID] = true;
+       }
    }
 
    return(stat);
@@ -1247,11 +1346,11 @@ int CigiOutgoingMsg::RegisterUserPacket(CigiBasePacket *Packet,
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 void CigiOutgoingMsg::ClearHandlerTable()
 {
-      for(int ndx=0;ndx<200;ndx++)
+      for(int ndx=0;ndx<0xffff;ndx++)
       {
          if(OutgoingHandlerTbl[ndx] != (CigiBasePacket *)&DefaultPacket)
          {
-            delete OutgoingHandlerTbl[ndx];
+            //delete OutgoingHandlerTbl[ndx];
             OutgoingHandlerTbl[ndx] = &DefaultPacket;
          }
          VldSnd[ndx] = false;
@@ -1571,3 +1670,128 @@ void CigiOutgoingMsg::SetOutgoingIGV3Tbls(void)
 }
 
 
+// ================================================
+// SetOutgoingV4Tbls
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+void CigiOutgoingMsg::SetOutgoingHostV4Tbls(void)
+{
+   OutgoingHandlerTbl[CIGI_IG_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiIGCtrlV4;
+   VldSnd[CIGI_IG_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_ENTITY_POSITION_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiEntityPositionCtrlV4;
+   VldSnd[CIGI_ENTITY_POSITION_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_CONF_CLAMP_ENTITY_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiConfClampEntityCtrlV4;
+   VldSnd[CIGI_CONF_CLAMP_ENTITY_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_COMP_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiCompCtrlV4;
+   VldSnd[CIGI_COMP_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SHORT_COMP_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiShortCompCtrlV4;
+   VldSnd[CIGI_SHORT_COMP_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_ART_PART_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiArtPartCtrlV4;
+   VldSnd[CIGI_ART_PART_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SHORT_ART_PART_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiShortArtPartCtrlV4;
+   VldSnd[CIGI_SHORT_ART_PART_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_VELOCITY_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiVelocityCtrlV4;
+   VldSnd[CIGI_VELOCITY_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_ENV_RGN_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiEnvRgnCtrlV4;
+   VldSnd[CIGI_ENV_RGN_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_CELESTIAL_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiCelestialCtrlV4;
+   VldSnd[CIGI_CELESTIAL_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_ATMOS_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiAtmosCtrlV4;
+   VldSnd[CIGI_ATMOS_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_WEATHER_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiWeatherCtrlV4;
+   VldSnd[CIGI_WEATHER_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_MARITIME_SURFACE_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiMaritimeSurfaceCtrlV4;
+   VldSnd[CIGI_MARITIME_SURFACE_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_WAVE_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiWaveCtrlV4;
+   VldSnd[CIGI_WAVE_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_TERRESTRIAL_SURFACE_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiTerrestrialSurfaceCtrlV4;
+   VldSnd[CIGI_TERRESTRIAL_SURFACE_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_VIEW_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiViewCtrlV4;
+   VldSnd[CIGI_VIEW_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SENSOR_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiSensorCtrlV4;
+   VldSnd[CIGI_SENSOR_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_MOTION_TRACK_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiMotionTrackCtrlV4;
+   VldSnd[CIGI_MOTION_TRACK_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_EARTH_MODEL_DEF_PACKET_ID_V4] = (CigiBasePacket *) new CigiEarthModelDefV4;
+   VldSnd[CIGI_EARTH_MODEL_DEF_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_ACCELERATION_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiAccelerationCtrlV4;
+   VldSnd[CIGI_ACCELERATION_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_VIEW_DEF_PACKET_ID_V4] = (CigiBasePacket *) new CigiViewDefV4;
+   VldSnd[CIGI_VIEW_DEF_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_COLL_DET_SEG_DEF_PACKET_ID_V4] = (CigiBasePacket *) new CigiCollDetSegDefV4;
+   VldSnd[CIGI_COLL_DET_SEG_DEF_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_COLL_DET_VOL_DEF_PACKET_ID_V4] = (CigiBasePacket *) new CigiCollDetVolDefV4;
+   VldSnd[CIGI_COLL_DET_VOL_DEF_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_HAT_HOT_REQ_PACKET_ID_V4] = (CigiBasePacket *) new CigiHatHotReqV4;
+   VldSnd[CIGI_HAT_HOT_REQ_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_LOS_SEG_REQ_PACKET_ID_V4] = (CigiBasePacket *) new CigiLosSegReqV4;
+   VldSnd[CIGI_LOS_SEG_REQ_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_LOS_VECT_REQ_PACKET_ID_V4] = (CigiBasePacket *) new CigiLosVectReqV4;
+   VldSnd[CIGI_LOS_VECT_REQ_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_POSITION_REQ_PACKET_ID_V4] = (CigiBasePacket *) new CigiPositionReqV4;
+   VldSnd[CIGI_POSITION_REQ_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_ENV_COND_REQ_PACKET_ID_V4] = (CigiBasePacket *) new CigiEnvCondReqV4;
+   VldSnd[CIGI_ENV_COND_REQ_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SYMBOL_SURFACE_DEF_PACKET_ID_V4] = (CigiBasePacket *) new CigiSymbolSurfaceDefV4;
+   VldSnd[CIGI_SYMBOL_SURFACE_DEF_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SYMBOL_TEXT_DEFINITION_PACKET_ID_V4] = (CigiBasePacket *) new CigiSymbolTextDefV4;
+   VldSnd[CIGI_SYMBOL_TEXT_DEFINITION_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_ID_V4] = (CigiBasePacket *) new CigiSymbolCircleDefV4;
+   VldSnd[CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SYMBOL_POLYGON_DEFINITION_PACKET_ID_V4] = (CigiBasePacket *) new CigiSymbolPolygonDefV4;
+   VldSnd[CIGI_SYMBOL_POLYGON_DEFINITION_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SYMBOL_CLONE_PACKET_ID_V4] = (CigiBasePacket *) new CigiSymbolCloneV4;
+   VldSnd[CIGI_SYMBOL_CLONE_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SYMBOL_CONTROL_PACKET_ID_V4] = (CigiBasePacket *) new CigiSymbolCtrlV4;
+   VldSnd[CIGI_SYMBOL_CONTROL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SHORT_SYMBOL_CONTROL_PACKET_ID_V4] = (CigiBasePacket *) new CigiShortSymbolCtrlV4;
+   VldSnd[CIGI_SHORT_SYMBOL_CONTROL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SYMBOL_TEXTURED_CIRCLE_DEFINITION_PACKET_ID_V4] = (CigiBasePacket *) new CigiSymbolTexturedCircleDefV4;
+   VldSnd[CIGI_SYMBOL_TEXTURED_CIRCLE_DEFINITION_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SYMBOL_TEXTURED_POLYGON_DEFINITION_PACKET_ID_V4] = (CigiBasePacket *) new CigiSymbolTexturedPolygonDefV4;
+   VldSnd[CIGI_SYMBOL_TEXTURED_POLYGON_DEFINITION_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_ENTITY_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiEntityCtrlV4;
+   VldSnd[CIGI_ENTITY_CTRL_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_ANIMATION_CTRL_PACKET_ID_V4] = (CigiBasePacket *) new CigiAnimationCtrlV4;
+   VldSnd[CIGI_ANIMATION_CTRL_PACKET_ID_V4] = true;
+}
+
+// ================================================
+// SetOutgoingV4Tbls
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+void CigiOutgoingMsg::SetOutgoingIGV4Tbls(void)
+{
+   OutgoingHandlerTbl[CIGI_SOF_PACKET_ID_V4] = (CigiBasePacket *) new CigiSOFV4;
+   VldSnd[CIGI_SOF_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_HAT_HOT_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiHatHotRespV4;
+   VldSnd[CIGI_HAT_HOT_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_HAT_HOT_XRESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiHatHotXRespV4;
+   VldSnd[CIGI_HAT_HOT_XRESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_LOS_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiLosRespV4;
+   VldSnd[CIGI_LOS_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_LOS_XRESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiLosXRespV4;
+   VldSnd[CIGI_LOS_XRESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SENSOR_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiSensorRespV4;
+   VldSnd[CIGI_SENSOR_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_SENSOR_XRESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiSensorXRespV4;
+   VldSnd[CIGI_SENSOR_XRESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_POSITION_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiPositionRespV4;
+   VldSnd[CIGI_POSITION_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_WEATHER_COND_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiWeatherCondRespV4;
+   VldSnd[CIGI_WEATHER_COND_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_AEROSOL_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiAerosolRespV4;
+   VldSnd[CIGI_AEROSOL_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_MARITIME_SURFACE_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiMaritimeSurfaceRespV4;
+   VldSnd[CIGI_MARITIME_SURFACE_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_TERRESTRIAL_SURFACE_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiTerrestrialSurfaceRespV4;
+   VldSnd[CIGI_TERRESTRIAL_SURFACE_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_COLL_DET_SEG_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiCollDetSegRespV4;
+   VldSnd[CIGI_COLL_DET_SEG_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_COLL_DET_VOL_RESP_PACKET_ID_V4] = (CigiBasePacket *) new CigiCollDetVolRespV4;
+   VldSnd[CIGI_COLL_DET_VOL_RESP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_ANIMATION_STOP_PACKET_ID_V4] = (CigiBasePacket *) new CigiAnimationStopV4;
+   VldSnd[CIGI_ANIMATION_STOP_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_EVENT_NOTIFICATION_PACKET_ID_V4] = (CigiBasePacket *) new CigiEventNotificationV4;
+   VldSnd[CIGI_EVENT_NOTIFICATION_PACKET_ID_V4] = true;
+   OutgoingHandlerTbl[CIGI_IG_MSG_PACKET_ID_V4] = (CigiBasePacket *) new CigiIGMsgV4;
+   VldSnd[CIGI_IG_MSG_PACKET_ID_V4] = true;
+}

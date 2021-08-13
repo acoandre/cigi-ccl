@@ -44,7 +44,10 @@
  *  
  *  05/15/2008 Greg Basler                       Version 2.2.0
  *  Corrected Version Number
- *  
+ *
+ *  12/14/2018 Paul Slade                       Version 4.0.2
+ *  Fixed GetCnvt for Cigi4
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -120,8 +123,8 @@ int CigiLosRespV3_2::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) 
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    *CDta.s++ = Data->LosID;
 
@@ -209,8 +212,10 @@ int CigiLosRespV3_2::GetCnvt(CigiVersionID &CnvtVersion,
    // CIGI_LOS_RESP_PACKET_ID_V3_2 are the same
    if(CnvtVersion.CigiMajorVersion < 3)
       CnvtInfo.CnvtPacketID = CIGI_LOS_RESP_PACKET_ID_V2;
-   else
+   else if (CnvtVersion.CigiMajorVersion < 4)
       CnvtInfo.CnvtPacketID = CIGI_LOS_RESP_PACKET_ID_V3;
+   else
+       CnvtInfo.CnvtPacketID = CIGI_LOS_RESP_PACKET_ID_V4;
 
 
 

@@ -23,7 +23,7 @@ XCollDetSegDef::~XCollDetSegDef()
 
 void XCollDetSegDef::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiCollDetSegDefV3 *InPckt = (CigiCollDetSegDefV3 *)Packet;
+   CigiCollDetSegDefV4 *InPckt = (CigiCollDetSegDefV4 *)Packet;
 
    printf("===> CollDetSegDef <===\n");
 

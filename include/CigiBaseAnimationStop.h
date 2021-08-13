@@ -46,6 +46,9 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,14 +67,19 @@
 #define CIGI_ANIMATION_STOP_PACKET_ID_V3 115
 #define CIGI_ANIMATION_STOP_PACKET_SIZE_V3 8
 
+#define CIGI_ANIMATION_STOP_PACKET_ID_V4 0x0ff2
+#define CIGI_ANIMATION_STOP_PACKET_SIZE_V4 8
+
 
 class CigiAnimationStopV3;
+class CigiAnimationStopV4;
 
 
 class CIGI_SPEC CigiBaseAnimationStop : public CigiBasePacket
 {
 
 friend class CigiAnimationStopV3;
+friend class CigiAnimationStopV4;
 
 public:
 
@@ -135,10 +143,15 @@ public:
          CnvtInfo.ProcID = CigiProcessType::ProcNone;
          CnvtInfo.CnvtPacketID = 0;
       }
-      else
+      else if(CnvtVersion.CigiMajorVersion < 4)
       {
          CnvtInfo.ProcID = CigiProcessType::ProcStd;
          CnvtInfo.CnvtPacketID = CIGI_ANIMATION_STOP_PACKET_ID_V3;
+      }
+      else
+      {
+         CnvtInfo.ProcID = CigiProcessType::ProcStd;
+         CnvtInfo.CnvtPacketID = CIGI_ANIMATION_STOP_PACKET_ID_V4;
       }
 
       return(CIGI_SUCCESS);

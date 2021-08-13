@@ -46,6 +46,9 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,10 +67,14 @@
 #define CIGI_POSITION_RESP_PACKET_ID_V3 108
 #define CIGI_POSITION_RESP_PACKET_SIZE_V3 48
 
+#define CIGI_POSITION_RESP_PACKET_ID_V4 0x0ff9
+#define CIGI_POSITION_RESP_PACKET_SIZE_V4 48
+
 
 class CigiPositionRespV1;
 class CigiPositionRespV2;
 class CigiPositionRespV3;
+class CigiPositionRespV4;
 
 
 class CIGI_SPEC CigiBasePositionResp : public CigiBasePacket
@@ -76,6 +83,7 @@ class CIGI_SPEC CigiBasePositionResp : public CigiBasePacket
 friend class CigiPositionRespV1;
 friend class CigiPositionRespV2;
 friend class CigiPositionRespV3;
+friend class CigiPositionRespV4;
 
 public:
 

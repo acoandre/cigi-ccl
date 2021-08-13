@@ -6,7 +6,7 @@
 #define _PROC_XWeatherCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiWeatherCtrlV3.h"
+#include "CigiWeatherCtrlV4.h"
 
 class XWeatherCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiWeatherCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiWeatherCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiWeatherCtrlV3 *TPckt;
+   CigiWeatherCtrlV4 *TPckt;
 
 };
 

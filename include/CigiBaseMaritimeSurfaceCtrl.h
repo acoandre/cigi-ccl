@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,14 +66,19 @@
 #define CIGI_MARITIME_SURFACE_CTRL_PACKET_ID_V3 13
 #define CIGI_MARITIME_SURFACE_CTRL_PACKET_SIZE_V3 24
 
+#define CIGI_MARITIME_SURFACE_CTRL_PACKET_ID_V4 0x0c
+#define CIGI_MARITIME_SURFACE_CTRL_PACKET_SIZE_V4 24
+
 
 class CigiMaritimeSurfaceCtrlV3;
+class CigiMaritimeSurfaceCtrlV4;
 
 
 class CIGI_SPEC CigiBaseMaritimeSurfaceCtrl : public CigiBasePacket
 {
 
 friend class CigiMaritimeSurfaceCtrlV3;
+friend class CigiMaritimeSurfaceCtrlV4;
 
 public:
 

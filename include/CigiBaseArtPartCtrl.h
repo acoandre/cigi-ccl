@@ -46,6 +46,11 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
+ *  12/12/2018 Paul Slade                      Version 4.0.2
+ *  Removed ArtPartIDV4 (must now use ArtPartIDV3 instead) to allow correct version conversion
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -71,10 +76,14 @@
 #define CIGI_ART_PART_CTRL_PACKET_ID_V3 6
 #define CIGI_ART_PART_CTRL_PACKET_SIZE_V3 32
 
+#define CIGI_ART_PART_CTRL_PACKET_ID_V4 0x05
+#define CIGI_ART_PART_CTRL_PACKET_SIZE_V4 32
+
 
 class CigiArtPartCtrlV1;
 class CigiArtPartCtrlV2;
 class CigiArtPartCtrlV3;
+class CigiArtPartCtrlV4;
 
 
 class CIGI_SPEC CigiBaseArtPartCtrl : public CigiBasePacket
@@ -83,6 +92,7 @@ class CIGI_SPEC CigiBaseArtPartCtrl : public CigiBasePacket
 friend class CigiArtPartCtrlV1;
 friend class CigiArtPartCtrlV2;
 friend class CigiArtPartCtrlV3;
+friend class CigiArtPartCtrlV4;
 
 public:
 

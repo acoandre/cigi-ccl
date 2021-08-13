@@ -52,6 +52,9 @@
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  The Boeing Company
  *
@@ -76,6 +79,9 @@
 #define CIGI_LOS_RESP_PACKET_ID_V3 104
 #define CIGI_LOS_RESP_PACKET_SIZE_V3 16
 
+#define CIGI_LOS_RESP_PACKET_ID_V4 0x0ffd
+#define CIGI_LOS_RESP_PACKET_SIZE_V4 24
+
 #define CIGI_LOS_XRESP_PACKET_ID_V3 105
 #define CIGI_LOS_XRESP_PACKET_SIZE_V3 56
 
@@ -85,13 +91,18 @@
 #define CIGI_LOS_XRESP_PACKET_ID_V3_2 105
 #define CIGI_LOS_XRESP_PACKET_SIZE_V3_2 56
 
+#define CIGI_LOS_XRESP_PACKET_ID_V4 0xffc
+#define CIGI_LOS_XRESP_PACKET_SIZE_V4 64
+
 
 class CigiLosRespV1;
 class CigiLosRespV2;
 class CigiLosRespV3;
 class CigiLosXRespV3;
+class CigiLosXRespV4;
 class CigiLosRespV3_2;
 class CigiLosXRespV3_2;
+class CigiLosXRespV4;
 
 
 class CIGI_SPEC CigiBaseLosResp : public CigiBasePacket
@@ -100,9 +111,11 @@ class CIGI_SPEC CigiBaseLosResp : public CigiBasePacket
 friend class CigiLosRespV1;
 friend class CigiLosRespV2;
 friend class CigiLosRespV3;
+friend class CigiLosRespV4;
 friend class CigiLosXRespV3;
 friend class CigiLosRespV3_2;
 friend class CigiLosXRespV3_2;
+friend class CigiLosXRespV4;
 
 
 public:

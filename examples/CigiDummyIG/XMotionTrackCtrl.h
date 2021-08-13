@@ -6,7 +6,7 @@
 #define _PROC_XMotionTrackCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiMotionTrackCtrlV3.h"
+#include "CigiMotionTrackCtrlV4.h"
 
 class XMotionTrackCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiMotionTrackCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiMotionTrackCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiMotionTrackCtrlV3 *TPckt;
+   CigiMotionTrackCtrlV4 *TPckt;
 
 };
 

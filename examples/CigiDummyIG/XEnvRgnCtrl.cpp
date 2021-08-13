@@ -23,16 +23,38 @@ XEnvRgnCtrl::~XEnvRgnCtrl()
 
 void XEnvRgnCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiEnvRgnCtrlV3 *InPckt = (CigiEnvRgnCtrlV3 *)Packet;
+   CigiEnvRgnCtrlV4 *InPckt = (CigiEnvRgnCtrlV4 *)Packet;
 
    printf("===> EnvRgnCtrl <===\n");
 
    printf("RegionID ==> %d\n",InPckt->GetRegionID());
-   printf("RgnState ==> %d\n",InPckt->GetRgnState());
-   printf("WeatherProp ==> %d\n",InPckt->GetWeatherProp());
-   printf("Aerosol ==> %d\n",InPckt->GetAerosol());
-   printf("MaritimeSurface ==> %d\n",InPckt->GetMaritimeSurface());
-   printf("TerrestrialSurface ==> %d\n",InPckt->GetTerrestrialSurface());
+   if( InPckt->GetRgnState() == 0 ) 
+	printf("RgnState ==> 0: Inactive\n");
+   else if( InPckt->GetRgnState() == 1 ) 
+	printf("RgnState ==> 1: Active\n");
+   else if( InPckt->GetRgnState() == 2 ) 
+	printf("RgnState ==> 2: Destroyed\n");
+
+   if( InPckt->GetWeatherProp() == 0 )
+	printf("WeatherProp ==> 0: Use Last\n" );
+   else 
+	printf("WeatherProp ==> 1: Merge\n" );
+
+   if( InPckt->GetAerosol() == 0 )
+	printf("Aerosol ==> 0: Use Last\n" );
+   else 
+	printf("Aerosol ==> 1: Merge\n" );
+
+   if( InPckt->GetMaritimeSurface()  == 0 )
+	printf("MaritimeSurface ==> 0: Use Last\n" );
+   else 
+	printf("MaritimeSurface ==> 1: Merge\n" );
+
+   if( InPckt->GetTerrestrialSurface() == 0 )
+	printf("TerrestrialSurface ==> 0: Use Last\n" );
+   else 
+	printf("TerrestrialSurface ==> 1: Merge\n" );
+
    printf("Lat ==> %f\n",InPckt->GetLat());
    printf("Lon ==> %f\n",InPckt->GetLon());
    printf("XSize ==> %f\n",InPckt->GetXSize());

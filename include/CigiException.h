@@ -37,11 +37,25 @@
  *  
  *  01/21/2005 Greg Basler                       Version 1.5
  *  Included the CigiTypes.h header file.
+ *  
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *  Added PRAGMA to remove C4251 warnings
+ *
  * </pre>
  *  Author: The Boeing Company
  *
  */
 
+#if _MSC_VER >= 1500 // VC9
+#pragma warning ( push )
+// These warnings relate to the fact that std::exception is a base class of CigiException.
+// When building DLL CigiException is declared with __declspec(dllexport) while std::exception
+// is not.
+// This is one of the reasons why you MUST build the dll with the same VS toolchain as your app.
+// This should be investigated and fixed at some point in time.
+#pragma warning (disable : 4251)
+#pragma warning (disable : 4275) // this one occurs in VS2017
+#endif
 
 class CigiException;
 

@@ -76,7 +76,7 @@ public:
    //==> Buffer Packing/Unpacking
 
    //=========================================================
-   //! The virtual Pack function for CIGI 3
+   //! The virtual Pack function for CIGI 4
    //! \param Base - A pointer to the instance of the packet 
    //!          to be packed. (Downcast to CigiBasePacket)
    //! \param Buff - A pointer to the current pack point.
@@ -89,7 +89,7 @@ public:
    virtual int Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) const;
 
    //=========================================================
-   //! The virtual Unpack function for CIGI 3
+   //! The virtual Unpack function for CIGI 4
    //! \param Buff - A pointer to the current pack point.
    //! \param Swap - N/A for V1 & V2
    //! \param Spec - A pointer to special data -

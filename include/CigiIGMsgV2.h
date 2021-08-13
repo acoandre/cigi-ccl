@@ -42,6 +42,10 @@
  *  Moved Packet information to base packet.
  *  Added Variable length packet processing
  *  
+ *  01/02/2019 Paul Slade                      Version 4.0.2
+ *  Switched to using STL vector for Msg. 
+ *  Version conversion fixes.
+ *  
  * </pre>
  *  The Boeing Company
  *
@@ -60,6 +64,10 @@ class CIGI_SPEC CigiIGMsgV2 : public CigiBaseIGMsg
 
 public:
 
+	enum {
+		PacketHeaderSize = 4,
+		MaxMessageSize = 96 // Maximum length of message string
+	};
    //==> Management
 
    //=========================================================

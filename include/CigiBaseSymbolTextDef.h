@@ -31,6 +31,8 @@
  *  03/11/2008 Greg Basler                       CIGI_SYM_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -51,8 +53,12 @@
 #define CIGI_SYMBOL_TEXT_DEFINITION_PACKET_ID_V3_3 30
 #define CIGI_SYMBOL_TEXT_DEFINITION_PACKET_SIZE_V3_3 12
 
+#define CIGI_SYMBOL_TEXT_DEFINITION_PACKET_ID_V4 0x1d 
+#define CIGI_SYMBOL_TEXT_DEFINITION_PACKET_SIZE_V4 12 //  plus text length
+
 
 class CigiSymbolTextDefV3_3;
+class CigiSymbolTextDefV4;
 
 
 //=========================================================
@@ -63,6 +69,7 @@ class CIGI_SPEC CigiBaseSymbolTextDef :
 {
 
    friend class CigiSymbolTextDefV3_3;
+   friend class CigiSymbolTextDefV4;
 
 public:
 
@@ -367,7 +374,7 @@ protected:
    //! MaxCharCnt<br>
    //! The maximum number of bytes not including NULLs
    //!
-   static const int MaxCharCnt = 235;
+   int MaxCharCnt;
 
 };
 

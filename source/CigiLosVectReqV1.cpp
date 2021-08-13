@@ -144,8 +144,8 @@ int CigiLosVectReqV1::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec)
 
    CDta.d = DBuf;
 
-   *CDta.c++ = Data->PacketID;
-   *CDta.c++ = Data->PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) Data->PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) Data->PacketSize;
 
    CIGI_SCOPY2(CDta.s++, &Data->LosID);
 

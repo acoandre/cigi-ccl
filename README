@@ -7,24 +7,35 @@ about CIGI and the CCL can be found on the CIGI web site:
 INSTALLATION
 ============
 
+CMake
+Cmake is used to build
+CCL for multiple platforms. For simplicity a number of scripts are provided in
+the ccl directory for building the most common build targets.
+
 Windows systems
 ---------------
 
-The CCL can be compiled as a DLL or as a static LIB.  The project files for 
-compiling as a DLL can be found in the ccl_dll directory, and project files 
-for compiling as a LIB can be found in the ccl_lib directory.
+The CCL can be compiled as a DLL or as a static LIB.  The following scripts can be used to build common Visual Studio targets:
+
+	cmake_generate_vc2010_win32.bat
+	cmake_generate_vc2017_x64.bat
+	cmake_generate_vc2010_x64.bat
+	cmake_generate_vc2013_win32.bat
+	cmake_generate_vc2013_x64.bat 
+	cmake_generate_vc2015_win32.bat
+	cmake_generate_vc2015_x64.bat
+	cmake_generate_vc2017_win32.bat
+
+To build with examples or non-standard build options (e.g. with exception handling disabled) cmake gui should be run and the required CCL options set before generating the project and building the solution manually (alternatively a custom script could be written to do this using cmake).
 
 UNIX systems
 ------------
 
-UNIX installation instructions can be found in the INSTALL file.
+The following scripts can be used to build the standard makefile output:
 
-Briefly, the process goes like this:
-	./configure
-	make
+	cmake_generate_linux.sh
 
-And run the following as 'root':
-	make install
+This will create the output files in _linux\lib.
 
 
 USAGE

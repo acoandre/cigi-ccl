@@ -6,7 +6,7 @@
 #define _PROC_XEnvRgnCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiEnvRgnCtrlV3.h"
+#include "CigiEnvRgnCtrlV4.h"
 
 class XEnvRgnCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiEnvRgnCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiEnvRgnCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiEnvRgnCtrlV3 *TPckt;
+   CigiEnvRgnCtrlV4 *TPckt;
 
 };
 

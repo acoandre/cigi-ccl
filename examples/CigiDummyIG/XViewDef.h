@@ -6,7 +6,7 @@
 #define _PROC_XViewDef_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiViewDefV3.h"
+#include "CigiViewDefV4.h"
 
 class XViewDef : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiViewDefV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiViewDefV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiViewDefV3 *TPckt;
+   CigiViewDefV4 *TPckt;
 
 };
 

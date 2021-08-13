@@ -94,6 +94,7 @@ CigiIGCtrlV3::CigiIGCtrlV3()
    TimestampValid = false;
    SmoothingEn = false;
    LastRcvdIGFrame = 0;
+   EntityTypeSubEn = false;
 
 }
 
@@ -122,8 +123,8 @@ int CigiIGCtrlV3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) con
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
    *CDta.c++ = Version;
 
    *CDta.b++ = Data->DatabaseID;

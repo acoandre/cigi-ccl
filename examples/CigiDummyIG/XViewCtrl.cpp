@@ -23,7 +23,7 @@ XViewCtrl::~XViewCtrl()
 
 void XViewCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-CigiViewCtrlV3 *InPckt = (CigiViewCtrlV3 *)Packet;
+CigiViewCtrlV4 *InPckt = (CigiViewCtrlV4 *)Packet;
 
    printf("===> ViewCtrl <===\n");
 
@@ -39,8 +39,8 @@ CigiViewCtrlV3 *InPckt = (CigiViewCtrlV3 *)Packet;
    printf("XOff ==> %f\n",InPckt->GetXOff());
    printf("YOff ==> %f\n",InPckt->GetYOff());
    printf("ZOff ==> %f\n",InPckt->GetZOff());
-   printf("Roll ==> %f\n",InPckt->GetRoll());
-   printf("Pitch ==> %f\n",InPckt->GetPitch());
    printf("Yaw ==> %f\n",InPckt->GetYaw());
+   printf("Pitch ==> %f\n",InPckt->GetPitch());
+   printf("Roll ==> %f\n",InPckt->GetRoll());
 
 }

@@ -102,8 +102,8 @@ int CigiMaritimeSurfaceRespV3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, vo
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    *CDta.c++ = Data->RequestID;
 

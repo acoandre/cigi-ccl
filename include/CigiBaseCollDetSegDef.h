@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -70,10 +72,14 @@
 #define CIGI_COLL_DET_SEG_DEF_PACKET_ID_V3 22
 #define CIGI_COLL_DET_SEG_DEF_PACKET_SIZE_V3 40
 
+#define CIGI_COLL_DET_SEG_DEF_PACKET_ID_V4 0x15
+#define CIGI_COLL_DET_SEG_DEF_PACKET_SIZE_V4 40
+
 
 class CigiCollDetSegDefV1;
 class CigiCollDetSegDefV2;
 class CigiCollDetSegDefV3;
+class CigiCollDetSegDefV4;
 
 
 class CIGI_SPEC CigiBaseCollDetSegDef : public CigiBasePacket
@@ -82,6 +88,7 @@ class CIGI_SPEC CigiBaseCollDetSegDef : public CigiBasePacket
 friend class CigiCollDetSegDefV1;
 friend class CigiCollDetSegDefV2;
 friend class CigiCollDetSegDefV3;
+friend class CigiCollDetSegDefV4;
 
 public:
 
@@ -90,12 +97,12 @@ public:
    //=========================================================
    //! General Constructor
    //!
-   CigiBaseCollDetSegDef() { };
+   CigiBaseCollDetSegDef();
 
    //=========================================================
    //! General Destructor
    //!
-   virtual ~CigiBaseCollDetSegDef() { };
+   virtual ~CigiBaseCollDetSegDef();
 
 
    //==> Buffer Packing/Unpacking
@@ -138,18 +145,7 @@ public:
    //!   defined in CigiErrorCodes.h
    //!
 	virtual int GetCnvt(CigiVersionID &CnvtVersion,
-                       CigiCnvtInfoType::Type &CnvtInfo)
-   {
-      CnvtInfo.ProcID = CigiProcessType::ProcStd;
-
-      // Note: V1 & V2 are the same
-      if(CnvtVersion.CigiMajorVersion < 3)
-         CnvtInfo.CnvtPacketID = CIGI_COLL_DET_SEG_DEF_PACKET_ID_V2;
-      else
-         CnvtInfo.CnvtPacketID = CIGI_COLL_DET_SEG_DEF_PACKET_ID_V3;
-
-      return(CIGI_SUCCESS);
-   }
+                       CigiCnvtInfoType::Type &CnvtInfo);
 
 
 

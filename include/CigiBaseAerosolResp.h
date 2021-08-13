@@ -62,14 +62,19 @@
 #define CIGI_AEROSOL_RESP_PACKET_ID_V3 110
 #define CIGI_AEROSOL_RESP_PACKET_SIZE_V3 8
 
+#define CIGI_AEROSOL_RESP_PACKET_ID_V4 0x0ff7
+#define CIGI_AEROSOL_RESP_PACKET_SIZE_V4 16
+
 
 class CigiAerosolRespV3;
+class CigiAerosolRespV4;
 
 
 class CIGI_SPEC CigiBaseAerosolResp : public CigiBasePacket
 {
 
 friend class CigiAerosolRespV3;
+friend class CigiAerosolRespV4;
 
 public:
 

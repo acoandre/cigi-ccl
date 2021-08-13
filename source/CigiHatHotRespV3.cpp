@@ -53,7 +53,10 @@
  *  
  *  05/14/2008 Greg Basler                       Version 2.2.0
  *  Fixed the conversion process.
- *  
+ *
+ *  12/14/2018 Paul Slade                       Version 4.0.2
+ *  Fixed GetCnvt for Cigi4
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -120,8 +123,8 @@ int CigiHatHotRespV3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec)
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    *CDta.s++ = Data->HatHotID;
 
@@ -280,9 +283,12 @@ int CigiHatHotRespV3::GetCnvt(CigiVersionID &CnvtVersion,
       else
          CnvtInfo.CnvtPacketID = CIGI_HOT_RESP_PACKET_ID_V2;
       break;
+   case 3:
+       CnvtInfo.CnvtPacketID = CIGI_HAT_HOT_RESP_PACKET_ID_V3;
+       break;
    default:
-      // The Packet ID for all V3 HatHotResp are the same ID
-      CnvtInfo.CnvtPacketID = CIGI_HAT_HOT_RESP_PACKET_ID_V3;
+      // The Packet ID for all V4 HatHotResp are the same ID
+      CnvtInfo.CnvtPacketID = CIGI_HAT_HOT_RESP_PACKET_ID_V4;
       break;
    }
 

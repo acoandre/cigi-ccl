@@ -6,7 +6,7 @@
 #define _PROC_XAtmosCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiAtmosCtrl.h"
+#include "CigiAtmosCtrlV4.h"
 
 class XAtmosCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiAtmosCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiAtmosCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiAtmosCtrlV3 *TPckt;
+   CigiAtmosCtrlV4 *TPckt;
 
 };
 

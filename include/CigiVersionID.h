@@ -31,6 +31,9 @@
  *  09/17/2003 Greg Basler                       CIGI_CR_DR_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *  Updated IsKnownCigiVersion(), BestCigiVersion()
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -132,6 +135,11 @@ public:
             if((CigiMinorVersion >= 0) && (CigiMinorVersion <= 3))
                KnownVer = true;
          }
+         else if(CigiMajorVersion == 4)
+         {
+            if((CigiMinorVersion == 0) && (CigiMinorVersion == 0))
+               KnownVer = true;
+         }
       }
 
       return(KnownVer);
@@ -147,16 +155,15 @@ public:
          CigiMinorVersion = 0;
       else if(CigiMajorVersion == 3)
       {
-         if(CigiMinorVersion > 3)
+         if(CigiMinorVersion >= 3)
             CigiMinorVersion = 3;
          else if(CigiMinorVersion < 2)
             CigiMinorVersion = 0;
       }
-      else
+      else if(CigiMajorVersion == 4)
       {
          // Set the version to the most mature version of CIGI
-         CigiMajorVersion = 3;
-         CigiMinorVersion = 3;
+         CigiMinorVersion = 0;
       }
    }
 

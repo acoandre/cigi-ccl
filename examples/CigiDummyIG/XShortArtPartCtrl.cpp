@@ -23,7 +23,7 @@ XShortArtPartCtrl::~XShortArtPartCtrl()
 
 void XShortArtPartCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiShortArtPartCtrlV3 *InPckt = (CigiShortArtPartCtrlV3 *)Packet;
+   CigiShortArtPartCtrlV4 *InPckt = (CigiShortArtPartCtrlV4 *)Packet;
 
    printf("===> ShortArtPartCtrl <===\n");
 

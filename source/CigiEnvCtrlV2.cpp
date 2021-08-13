@@ -97,6 +97,7 @@ CigiEnvCtrlV2::CigiEnvCtrlV2()
 
    Hour = 0;
    Minute = 0;
+   Seconds = 0.0;
    Month = 1;
    Day = 1;
    Year = 2000;
@@ -145,8 +146,8 @@ int CigiEnvCtrlV2::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) co
 
    CDta.d = DBuf;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    *CDta.c++ = Data->Hour;
    *CDta.c++ = Data->Minute;

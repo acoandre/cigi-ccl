@@ -49,6 +49,10 @@
  *  Corrected a few initialization and message setting problems.
  *  Added Variable length packet processing
  *  
+ *  01/02/2019 Paul Slade                      Version 4.0.2
+ *  Switched to using STL vector for Msg. 
+ *  Version conversion fixes.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -61,6 +65,7 @@
 #include "CigiExceptions.h"
 
 #include <string.h>
+#include <algorithm>
 
 
 #ifdef CIGI_LITTLE_ENDIAN
@@ -72,8 +77,6 @@
    #define CIGI_SCOPY4 CigiCopy4
    #define CIGI_SCOPY8 CigiCopy8
 #endif
-
-
 
 
 // ====================================================================
@@ -88,13 +91,14 @@ CigiIGMsgV2::CigiIGMsgV2()
 {
 
    PacketID = CIGI_IG_MSG_PACKET_ID_V2;
-   PacketSize = 8;
+   VariableDataSize = 4;
+   PacketSize = VariableDataSize + PacketHeaderSize;
    Version = 2;
    MinorVersion = 0;
 
    MsgID = 0;
-   memset(Msg,0,4);
-   VariableDataSize = MsgLen = 4;
+   Msg.resize(1);
+   Msg[0] = 0;
 
 }
 
@@ -122,15 +126,28 @@ int CigiIGMsgV2::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) cons
 
    Cigi_uint8 *CDta = Buff;
 
-   *CDta++ = PacketID;
-   *CDta++ = Data->PacketSize;
+   Cigi_uint16 msgSize = std::min(Cigi_uint16(Data->Msg.size()), Cigi_uint16(MaxMessageSize));
+   Data->Msg[msgSize-1] = 0;
+
+   // Make sure data is aligned correctly
+   Data->VariableDataSize = (msgSize + 3) & ~3;
+   Cigi_uint16 packetSizeAdjust = Data->VariableDataSize - msgSize;
+   Data->PacketSize = PacketHeaderSize + Data->VariableDataSize;
+
+   *CDta = ( Cigi_uint8 ) PacketID;
+   *CDta = ( Cigi_uint8 ) PacketSize;
 
    CIGI_SCOPY2(&tbuf, &Data->MsgID);
    memcpy(CDta,&tbuf,2);
    CDta += 2;
 
 
-   memcpy(CDta,Data->Msg,Data->MsgLen);
+   memcpy(CDta,&Data->Msg[0],msgSize);
+
+   if(packetSizeAdjust) {
+	   CDta += msgSize;
+	   memset(CDta, 0, packetSizeAdjust);
+   }
 
    return(Data->PacketSize);
 
@@ -156,25 +173,28 @@ int CigiIGMsgV2::Unpack(Cigi_uint8 * Buff, bool Swap, void *Spec)
 
    CDta += 2;
 
-   if(tPktSz > 104)
+   if(tPktSz > MaxMessageSize + PacketHeaderSize)
    {
-      PacketSize = 104;
-      memcpy(&Msg,CDta,99);
-      Msg[99] = 0;
+      PacketSize = MaxMessageSize + PacketHeaderSize;
+	  Msg.resize(MaxMessageSize);
+      memcpy(&Msg[0],CDta,MaxMessageSize);
+      Msg[MaxMessageSize-1] = 0;
    }
-   else if(tPktSz <= 5)
+   else if(tPktSz <= PacketHeaderSize + 1)
    {
       PacketSize = tPktSz;
-      Msg[0] = 0;
+ 	  Msg.resize(1,0);
+	  Msg[0] = 0;
    }
    else
    {
       PacketSize = tPktSz;
-      memcpy(&Msg,CDta,(tPktSz - 4));
-      Msg[(tPktSz - 5)] = 0;
+	  Msg.resize(tPktSz - PacketHeaderSize);
+      memcpy(&Msg[0],CDta,(tPktSz - PacketHeaderSize));
+      Msg[(tPktSz - PacketHeaderSize - 1)] = 0;
    }
 
-   MsgLen = PacketSize - 4;
+   VariableDataSize = (Msg.size() + 3) & ~3;
 
    return(tPktSz);
 
@@ -186,7 +206,7 @@ int CigiIGMsgV2::Unpack(Cigi_uint8 * Buff, bool Swap, void *Spec)
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 int CigiIGMsgV2::GetTruePacketSize(CigiBaseVariableSizePckt &refPacket)
 {
-   return(refPacket.GetVariableDataSize() + 4);
+   return(refPacket.GetVariableDataSize() + PacketHeaderSize);
 }
 
 
@@ -202,35 +222,24 @@ int CigiIGMsgV2::GetTruePacketSize(CigiBaseVariableSizePckt &refPacket)
 int CigiIGMsgV2::SetMsg(const Cigi_Ascii *MsgIn, bool bndchk)
 {
 
-   MsgLen = strlen(MsgIn);
+   size_t MsgLen = strlen(MsgIn) + 1;
 
-   if(MsgLen == 0)
+   if(MsgLen >= MaxMessageSize)
    {
-      MsgLen = 4;
-      memset(Msg,0,4);
-   }
-   else if(MsgLen >= 95)
-   {
-      MsgLen = 100;
-      memcpy(Msg,MsgIn,95);
-      memset(&Msg[MsgLen],0,5);
-      Msg[99] = 0;
+      MsgLen = MaxMessageSize;
+ 	  Msg.resize(MsgLen);
+      memcpy(&Msg[0],MsgIn,MaxMessageSize - 1);
+      Msg[MaxMessageSize - 1] = 0;
    }
    else
    {
-      memcpy(Msg,MsgIn,MsgLen);
+	  Msg.resize(MsgLen);
+      memcpy(&Msg[0],MsgIn,MsgLen);
 
-      int tadj = (MsgLen + 1) % 4;
-
-      tadj = (tadj == 0) ? 1 : (5 - tadj);
-
-      memset(&Msg[MsgLen],0,(tadj+4));
-
-      MsgLen += tadj;
    }
 
-   VariableDataSize = MsgLen;
-   PacketSize = VariableDataSize + 4;
+   VariableDataSize = (MsgLen + 3) & ~3;
+   PacketSize = VariableDataSize + PacketHeaderSize;
 
    return(CIGI_SUCCESS);
 }

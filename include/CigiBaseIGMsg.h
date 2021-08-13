@@ -47,6 +47,13 @@
  *  Moved Packet information to base packet.
  *  Added Variable length packet processing
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
+ *  01/02/2019 Paul Slade                      Version 4.0.2
+ *  Switched to using STL vector for Msg. 
+ *  Version conversion fixes.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -57,6 +64,7 @@
 #define _CIGI_BASE_IG_MSG_INCLUDED_
 
 #include "CigiBaseVariableSizePckt.h"
+#include <vector>
 
 // ====================================================================
 // preprocessor definitions
@@ -66,9 +74,12 @@
 
 #define CIGI_IG_MSG_PACKET_ID_V3 117
 
+#define CIGI_IG_MSG_PACKET_ID_V4 0x0ff0
+
 
 class CigiIGMsgV2;
 class CigiIGMsgV3;
+class CigiIGMsgV4;
 
 
 class CIGI_SPEC CigiBaseIGMsg : public CigiBaseVariableSizePckt
@@ -76,6 +87,7 @@ class CIGI_SPEC CigiBaseIGMsg : public CigiBaseVariableSizePckt
 
 friend class CigiIGMsgV2;
 friend class CigiIGMsgV3;
+friend class CigiIGMsgV4;
 
 public:
 
@@ -140,13 +152,18 @@ public:
          CnvtInfo.ProcID = CigiProcessType::ProcNone;
          CnvtInfo.CnvtPacketID = 0;
       }
-      else
+      else if(CnvtVersion.CigiMajorVersion < 4)
       {
          CnvtInfo.ProcID = CigiProcessType::ProcVarSize;
          if(CnvtVersion.CigiMajorVersion < 3)
             CnvtInfo.CnvtPacketID = CIGI_IG_MSG_PACKET_ID_V2;
          else
             CnvtInfo.CnvtPacketID = CIGI_IG_MSG_PACKET_ID_V3;
+      }
+      else
+      {
+         CnvtInfo.ProcID = CigiProcessType::ProcVarSize;
+         CnvtInfo.CnvtPacketID = CIGI_IG_MSG_PACKET_ID_V4;
       }
 
       return(CIGI_SUCCESS);
@@ -193,7 +210,7 @@ public:
    //=========================================================
    //! Gets the Msg value.
    //! \return the current Msg.
-   Cigi_int8 *GetMsg(void) { return(Msg); }
+   Cigi_int8 *GetMsg(void) { return(&Msg[0]); }
 
 
    //+> MsgLen
@@ -201,7 +218,7 @@ public:
    //=========================================================
    //! Gets the Msg Length.
    //! \return the current MsgLen.
-   int GetMsgLen(void) const { return(MsgLen); }
+   int GetMsgLen(void) const { return(int(Msg.size())); }
 
 
 
@@ -219,13 +236,7 @@ protected:
    //! Msg<br>
    //! The message string
    //!
-   Cigi_int8 Msg[100];
-
-   //=========================================================
-   //! MsgLen<br>
-   //! The message string length
-   //!
-   int MsgLen;
+   std::vector<Cigi_int8> Msg;
 
 
 };

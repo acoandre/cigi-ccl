@@ -46,6 +46,8 @@
  *  12/14/2007 Greg Basler                       Version 2.0.0
  *  Added the Request ID parameter.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,14 +66,19 @@
 #define CIGI_ENV_COND_REQ_PACKET_ID_V3 28
 #define CIGI_ENV_COND_REQ_PACKET_SIZE_V3 32
 
+#define CIGI_ENV_COND_REQ_PACKET_ID_V4 0x1b
+#define CIGI_ENV_COND_REQ_PACKET_SIZE_V4 32
+
 
 class CigiEnvCondReqV3;
+class CigiEnvCondReqV4;
 
 
 class CIGI_SPEC CigiBaseEnvCondReq : public CigiBasePacket
 {
 
 friend class CigiEnvCondReqV3;
+friend class CigiEnvCondReqV4;
 
 public:
 

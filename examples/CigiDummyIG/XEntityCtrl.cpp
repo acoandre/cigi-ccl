@@ -23,34 +23,81 @@ XEntityCtrl::~XEntityCtrl()
 
 void XEntityCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiEntityCtrlV3_3 *InPckt = (CigiEntityCtrlV3_3 *)Packet;
+   CigiEntityCtrlV4 *InPckt = (CigiEntityCtrlV4 *)Packet;
 
    bool ok = true;
 
    printf("===> EntityCtrl <===\n");
 
    printf("EntityID ==> %d\n",InPckt->GetEntityID());
-   printf("EntityState ==> %d\n",InPckt->GetEntityState());
-   printf("AttachState ==> %d\n",InPckt->GetAttachState());
-   printf("CollisionDetectEn ==> %d\n",InPckt->GetCollisionDetectEn());
-   printf("InheritAlpha ==> %d\n",InPckt->GetInheritAlpha());
-   printf("GrndClamp ==> %d\n",InPckt->GetGrndClamp());
-   printf("AnimationDir ==> %d\n",InPckt->GetAnimationDir());
-   printf("AnimationLoopMode ==> %d\n",InPckt->GetAnimationLoopMode());
-   printf("AnimationState ==> %d\n",InPckt->GetAnimationState());
-   if(InPckt->GetSmoothingEn())
-      printf("Smoothing Enabled\n");
-   else
-      printf("Smoothing Disabled\n");
-   printf("Alpha ==> %d\n",InPckt->GetAlpha());
-   printf("EntityType ==> %d\n",InPckt->GetEntityType());
-   printf("ParentID ==> %d\n",InPckt->GetParentID());
-   printf("Roll ==> %f\n",InPckt->GetRoll());
-   printf("Pitch ==> %f\n",InPckt->GetPitch());
-   printf("Yaw ==> %f\n",InPckt->GetYaw());
-   printf("Xoff ==> %f\n",InPckt->GetXoff());
-   printf("Yoff ==> %f\n",InPckt->GetYoff());
-   printf("Zoff ==> %f\n",InPckt->GetZoff());
+   printf("EntityState = %d : ",InPckt->GetEntityState());
+   switch(InPckt->GetEntityState())
+   {
+   case 0:
+      printf("Inactive/Standby\n");
+      break;
+   case 1:
+      printf("Active\n");
+      break;
+   case 2:
+      printf("Destroyed\n");
+      break;
+   }
+   printf("Collision Reporting = %d : ",InPckt->GetCollisionDetectEn());
+   switch(InPckt->GetCollisionDetectEn())
+   {
+   case 0:
+      printf("Disabled\n");
+      break;
+   case 1:
+      printf("Enabled\n");
+      break;
+   }
+   printf("Inherit Alpha = %d : ",InPckt->GetInheritAlpha());
+   switch(InPckt->GetInheritAlpha())
+   {
+   case 0:
+      printf("Disabled\n");
+      break;
+   case 1:
+      printf("Enabled\n");
+      break;
+   }
 
+   printf("Smoothing Enable= %d : ",InPckt->GetSmoothingEn());
+   switch(InPckt->GetSmoothingEn())
+   {
+   case 0:
+      printf("Disabled\n");
+      break;
+   case 1:
+      printf("Enabled\n");
+      break;
+   }
+
+   printf("Extended Entity Type = %d : ",InPckt->GetExtendedEntityType());
+   switch(InPckt->GetExtendedEntityType())
+   {
+   case 0:
+      printf("Short\n");
+      break;
+   case 1:
+      printf("Extended\n");
+      break;
+   }
+
+   printf("Alpha ==> %d\n",InPckt->GetAlpha());
+   printf("EntityKind ==> %d\n",InPckt->GetEntityKind());
+   printf("EntityDomain ==> %d\n",InPckt->GetEntityDomain());
+   if( InPckt->GetExtendedEntityType() )
+	printf("EntityCountry ==> %d\n",InPckt->GetEntityCountry());
+   else
+	printf("ShortEntityType ==> %d\n",InPckt->GetShortEntityType());
+
+
+   printf("EntityCategory ==> %d\n",InPckt->GetEntityCategory());
+   printf("EntitySubcategory ==> %d\n",InPckt->GetEntitySubcategory());
+   printf("EntitySpecific ==> %d\n",InPckt->GetEntitySpecific());
+   printf("EntityExtra ==> %d\n",InPckt->GetEntityExtra());
 
 }

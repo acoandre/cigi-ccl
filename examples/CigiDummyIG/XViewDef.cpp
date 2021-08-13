@@ -23,7 +23,7 @@ XViewDef::~XViewDef()
 
 void XViewDef::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiViewDefV3 *InPckt = (CigiViewDefV3 *)Packet;
+   CigiViewDefV4 *InPckt = (CigiViewDefV4 *)Packet;
 
    printf("===> ViewDef <===\n");
 
@@ -35,9 +35,29 @@ void XViewDef::OnPacketReceived(CigiBasePacket *Packet)
    printf("FOVRightEn ==> %d\n",InPckt->GetFOVRightEn());
    printf("FOVTopEn ==> %d\n",InPckt->GetFOVTopEn());
    printf("FOVBottomEn ==> %d\n",InPckt->GetFOVBottomEn());
-   printf("MirrorMode ==> %d\n",InPckt->GetMirrorMode());
-   printf("PixelReplicateMode ==> %d\n",InPckt->GetPixelReplicateMode());
-   printf("ProjectionType ==> %d\n",InPckt->GetProjectionType());
+
+	if( InPckt->GetPixelReplicateMode() == 0 )
+	   printf("Pixel Replication Mode ==> 0: None\n" );
+	else if( InPckt->GetPixelReplicateMode() == 1 )
+	   printf("Pixel Replication Mode ==> 1: 1 x 2\n" );
+	else if( InPckt->GetPixelReplicateMode() == 2 )
+	   printf("Pixel Replication Mode ==> 2: 2 x 1\n" );
+	else if( InPckt->GetPixelReplicateMode() == 3 )
+	   printf("Pixel Replication Mode ==> 3: 2 x 2\n" );
+
+	if( InPckt->GetMirrorMode() == 0 )
+	   printf("Mirror Mode ==> 0: None\n" );
+	else if( InPckt->GetMirrorMode() == 1 )
+	   printf("Mirror Mode ==> 1: Horizontal\n" );
+	else if( InPckt->GetMirrorMode() == 2 )
+	   printf("Mirror Mode ==> 2: Vertical\n" );
+	else if( InPckt->GetMirrorMode() == 3 )
+	   printf("Mirror Mode ==> 3: Horizontal and Vertical\n" );
+
+	if( InPckt->GetProjectionType() == 0 )
+	   printf("ProjectionType ==> 0: Perspective\n");
+	else
+	   printf("ProjectionType ==> 1: Orthographic\n" );
    printf("Reorder ==> %d\n",InPckt->GetReorder());
    printf("ViewType ==> %d\n",InPckt->GetViewType());
    printf("FOVNear ==> %f\n",InPckt->GetFOVNear());

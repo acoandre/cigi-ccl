@@ -38,6 +38,13 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *
+ *  12/13/2018 Paul Slade                       Version 4.0.2
+ *  Fixes required to allow correct version conversion
+ *  Moved accessors that are not supported in V4 packet out of base class *
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -113,8 +120,10 @@ int CigiBaseEntityCtrl::GetCnvt(CigiVersionID &CnvtVersion,
    CnvtInfo.ProcID = CigiProcessType::ProcEntity;
 
    // All versions of this packet have the same packet id number
-   CnvtInfo.CnvtPacketID = CIGI_ENTITY_CTRL_PACKET_ID_V3;
-
+   if( CnvtVersion.CigiMajorVersion < 4 )
+		CnvtInfo.CnvtPacketID = CIGI_ENTITY_CTRL_PACKET_ID_V3;
+   else
+		CnvtInfo.CnvtPacketID = CIGI_ENTITY_CTRL_PACKET_ID_V4;
    return(CIGI_SUCCESS);
 }
 
@@ -122,117 +131,6 @@ int CigiBaseEntityCtrl::GetCnvt(CigiVersionID &CnvtVersion,
 // ====================================================================
 // Accessors
 // ====================================================================
-
-// ================================================
-// CigiBaseEntityCtrl
-// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-int CigiBaseEntityCtrl::SetPitch(const float PitchIn, bool bndchk)
-{
-
-#ifndef CIGI_NO_BND_CHK
-   if(bndchk && ((PitchIn < -90.0f)||(PitchIn > 90.0f)))
-   {
-#ifndef CIGI_NO_EXCEPT
-      throw CigiValueOutOfRangeException("Pitch",(double)PitchIn,-90.0,90.0);
-#endif
-      return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
-   }
-#endif
-
-   Pitch = PitchIn;
-
-   return(CIGI_SUCCESS);
-
-}
-
-// ================================================
-// CigiBaseEntityCtrl
-// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-int CigiBaseEntityCtrl::SetRoll(const float RollIn, bool bndchk)
-{
-
-#ifndef CIGI_NO_BND_CHK
-   if(bndchk && ((RollIn < -180.0f)||(RollIn > 180.0f)))
-   {
-#ifndef CIGI_NO_EXCEPT
-      throw CigiValueOutOfRangeException("Roll",(double)RollIn,-180.0,180.0);
-#endif
-      return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
-   }
-#endif
-
-   Roll = RollIn;
-
-   return(CIGI_SUCCESS);
-
-}
-
-// ================================================
-// SetLat
-// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-int CigiBaseEntityCtrl::SetLat(const double Lat, bool bndchk)
-{
-
-#ifndef CIGI_NO_BND_CHK
-   if(bndchk && ((Lat < -90.0f)||(Lat > 90.0f)))
-   {
-#ifndef CIGI_NO_EXCEPT
-      throw CigiValueOutOfRangeException("Lat",Lat,-90.0,90.0);
-#endif
-      return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
-   }
-#endif
-
-   LatOrXoff = Lat;
-
-   return(CIGI_SUCCESS);
-
-}
-
-// ================================================
-// SetLon
-// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-int CigiBaseEntityCtrl::SetLon(const double Lon, bool bndchk)
-{
-
-#ifndef CIGI_NO_BND_CHK
-   if(bndchk && ((Lon < -180.0f)||(Lon > 180.0f)))
-   {
-#ifndef CIGI_NO_EXCEPT
-      throw CigiValueOutOfRangeException("Lon",Lon,-180.0,180.0);
-#endif
-      return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
-   }
-#endif
-
-   LonOrYoff = Lon;
-
-   return(CIGI_SUCCESS);
-
-}
-
-
-// ================================================
-// SetAttachState
-// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-int CigiBaseEntityCtrl::SetAttachState(const AttachStateGrp AttachStateIn, bool bndchk)
-{
-
-#ifndef CIGI_NO_BND_CHK
-   if(bndchk && ((AttachStateIn < 0)||(AttachStateIn > 1)))
-   {
-#ifndef CIGI_NO_EXCEPT
-      throw CigiValueOutOfRangeException("AttachState",AttachStateIn,0,1);
-#endif
-      return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
-   }
-#endif
-
-   AttachState = AttachStateIn;
-
-   return(CIGI_SUCCESS);
-
-}
 
 // ================================================
 // SetCollisionDetectEn

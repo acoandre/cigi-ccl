@@ -6,7 +6,7 @@
 #define _PROC_XLosSegReq_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiLosSegReqV3_2.h"
+#include "CigiLosSegReqV4.h"
 
 class XLosSegReq : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiLosSegReqV3_2 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiLosSegReqV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiLosSegReqV3_2 *TPckt;
+   CigiLosSegReqV4 *TPckt;
 
 };
 

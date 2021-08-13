@@ -6,7 +6,7 @@
 #define _PROC_XShortCompCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiShortCompCtrlV3.h"
+#include "CigiShortCompCtrlV4.h"
 
 class XShortCompCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiShortCompCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiShortCompCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiShortCompCtrlV3 *TPckt;
+   CigiShortCompCtrlV4 *TPckt;
 
 };
 

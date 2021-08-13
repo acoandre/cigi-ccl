@@ -31,6 +31,8 @@
  *  09/17/2003 Greg Basler                       CIGI_CR_DR_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -48,9 +50,13 @@
 // ====================================================================
 
 #define CIGI_VERTEX_SYMBOL_DATA_SIZE_V3_3 8
+#define CIGI_VERTEX_SYMBOL_DATA_SIZE_V4 8
+#define CIGI_VERTEX_SYMBOL_TEXTURE_DATA_SIZE_V4 16
 
 
 class CigiVertexSymbolDataV3_3;
+class CigiVertexSymbolDataV4;
+class CigiVertexSymbolTextureDataV4;
 
 //=========================================================
 //! The base class for all packets.
@@ -59,6 +65,8 @@ class CIGI_SPEC CigiBaseVertexSymbolData
 {
 
    friend class CigiVertexSymbolDataV3_3;
+   friend class CigiVertexSymbolDataV4;
+   friend class CigiVertexSymbolTextureDataV4;
 
 public:
 

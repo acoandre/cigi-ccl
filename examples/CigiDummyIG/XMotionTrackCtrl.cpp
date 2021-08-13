@@ -23,7 +23,7 @@ XMotionTrackCtrl::~XMotionTrackCtrl()
 
 void XMotionTrackCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiMotionTrackCtrlV3 *InPckt = (CigiMotionTrackCtrlV3 *)Packet;
+   CigiMotionTrackCtrlV4 *InPckt = (CigiMotionTrackCtrlV4 *)Packet;
 
    bool ok = true;
 

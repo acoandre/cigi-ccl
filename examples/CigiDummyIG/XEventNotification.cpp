@@ -23,7 +23,7 @@ XEventNotification::~XEventNotification()
 
 void XEventNotification::OnPacketReceived(CigiBasePacket *Packet)
 {
-CigiEventNotificationV3 *InPckt = (CigiEventNotificationV3 *)Packet;
+CigiEventNotificationV4 *InPckt = (CigiEventNotificationV4 *)Packet;
 
    printf("===> EventNotification <===\n");
 

@@ -30,7 +30,10 @@
  *  
  *  03/11/2008 Greg Basler                       CIGI_SYM_1
  *  Initial Release.
- *  
+ *
+ *  12/07/2018 Paul Slade                       Version 4.0.2
+ *  Fix for Cigi 4.0 support
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -118,7 +121,10 @@ int CigiBaseSymbolLineDef::GetCnvt(CigiVersionID &CnvtVersion,
    else
    {
       CnvtInfo.ProcID = CigiProcessType::ProcStd;
-      CnvtInfo.CnvtPacketID = CIGI_SYMBOL_LINE_DEFINITION_PACKET_ID_V3_3;
+      if(CnvtVersion.CigiMajorVersion < 4)
+	  CnvtInfo.CnvtPacketID = CIGI_SYMBOL_LINE_DEFINITION_PACKET_ID_V3_3;
+      else
+	  CnvtInfo.CnvtPacketID = CIGI_SYMBOL_POLYGON_DEFINITION_PACKET_ID_V4;
    }
 
    return(CIGI_SUCCESS);
@@ -201,7 +207,7 @@ int CigiBaseSymbolLineDef::SetStipplePatternLen(const float StipplePatternLenIn,
 // ================================================
 int CigiBaseSymbolLineDef::GetVertexCount(void)
 {
-   return(Vertices.size());
+   return((int)Vertices.size());
 }
 
 // ================================================
@@ -221,7 +227,7 @@ CigiBaseVertexSymbolData * CigiBaseSymbolLineDef::GetVertex(int VertexIndex, boo
       if(bndchk)
       {
 #ifndef CIGI_NO_EXCEPT
-         throw CigiValueOutOfRangeException("VertexIndex", (int)VertexIndex,0,Vertices.size());
+         throw CigiValueOutOfRangeException("VertexIndex", (int)VertexIndex,0,(int)Vertices.size());
 #endif
       }
 #endif

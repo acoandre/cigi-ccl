@@ -6,7 +6,7 @@
 #define _PROC_XShortArtPartCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiShortArtPartCtrlV3.h"
+#include "CigiShortArtPartCtrlV4.h"
 
 class XShortArtPartCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiShortArtPartCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiShortArtPartCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiShortArtPartCtrlV3 *TPckt;
+   CigiShortArtPartCtrlV4 *TPckt;
 
 };
 

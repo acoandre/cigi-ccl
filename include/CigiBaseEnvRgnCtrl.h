@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,14 +66,19 @@
 #define CIGI_ENV_RGN_CTRL_PACKET_ID_V3 11
 #define CIGI_ENV_RGN_CTRL_PACKET_SIZE_V3 48
 
+#define CIGI_ENV_RGN_CTRL_PACKET_ID_V4 0x0a
+#define CIGI_ENV_RGN_CTRL_PACKET_SIZE_V4 48
+
 
 class CigiEnvRgnCtrlV3;
+class CigiEnvRgnCtrlV4;
 
 
 class CIGI_SPEC CigiBaseEnvRgnCtrl : public CigiBasePacket
 {
 
 friend class CigiEnvRgnCtrlV3;
+friend class CigiEnvRgnCtrlV4;
 
 public:
 

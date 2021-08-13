@@ -41,6 +41,10 @@
  *  06/23/2006 Greg Basler                       Version 1.7.1
  *  Changed native char and unsigned char types to CIGI types Cigi_int8 and 
  *  Cigi_uint8.
+ *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -63,8 +67,9 @@ CigiDefaultPacket::CigiDefaultPacket()
 
    PacketID = 0;
    PacketSize = 0;
-   Version = 3;
+   Version = 4;
    MinorVersion = 0;
+   DataPtr = 0;
 
 }
 
@@ -102,8 +107,7 @@ int CigiDefaultPacket::Unpack(Cigi_uint8 * Buff, bool Swap, void *Spec)
    DataPtr = Buff;
 
    // Get Size
-   DataPtr++;
-   Cigi_uint8 CurrentSize = *DataPtr;
+   Cigi_uint16 CurrentSize = *DataPtr;
 
    return(CurrentSize);
 

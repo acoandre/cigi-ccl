@@ -46,6 +46,9 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -70,10 +73,14 @@
 #define CIGI_VIEW_CTRL_PACKET_ID_V3 16
 #define CIGI_VIEW_CTRL_PACKET_SIZE_V3 32
 
+#define CIGI_VIEW_CTRL_PACKET_ID_V4 0x0f
+#define CIGI_VIEW_CTRL_PACKET_SIZE_V4 40
+
 
 class CigiViewCtrlV1;
 class CigiViewCtrlV2;
 class CigiViewCtrlV3;
+class CigiViewCtrlV4;
 
 
 class CIGI_SPEC CigiBaseViewCtrl : public CigiBasePacket
@@ -82,6 +89,7 @@ class CIGI_SPEC CigiBaseViewCtrl : public CigiBasePacket
 friend class CigiViewCtrlV1;
 friend class CigiViewCtrlV2;
 friend class CigiViewCtrlV3;
+friend class CigiViewCtrlV4;
 
 public:
 

@@ -31,6 +31,8 @@
  *  09/17/2003 Greg Basler                       CIGI_CR_DR_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -48,9 +50,11 @@
 // ====================================================================
 
 #define CIGI_CIRCLE_SYMBOL_DATA_SIZE_V3_3 24
+#define CIGI_CIRCLE_SYMBOL_DATA_SIZE_V4 24
 
 
 class CigiCircleSymbolDataV3_3;
+class CigiCircleSymbolDataV4;
 
 //=========================================================
 //! The base class for all packets.
@@ -59,6 +63,7 @@ class CIGI_SPEC CigiBaseCircleSymbolData
 {
 
    friend class CigiCircleSymbolDataV3_3;
+   friend class CigiCircleSymbolDataV4;
 
 public:
 

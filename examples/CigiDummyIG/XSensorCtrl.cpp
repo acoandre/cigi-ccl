@@ -23,7 +23,7 @@ XSensorCtrl::~XSensorCtrl()
 
 void XSensorCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiSensorCtrlV3 *InPckt = (CigiSensorCtrlV3 *)Packet;
+   CigiSensorCtrlV4 *InPckt = (CigiSensorCtrlV4 *)Packet;
 
    bool ok = true;
 

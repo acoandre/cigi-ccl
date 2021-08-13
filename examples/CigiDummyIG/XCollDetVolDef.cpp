@@ -23,7 +23,7 @@ XCollDetVolDef::~XCollDetVolDef()
 
 void XCollDetVolDef::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiCollDetVolDefV3 *InPckt = (CigiCollDetVolDefV3 *)Packet;
+   CigiCollDetVolDefV4 *InPckt = (CigiCollDetVolDefV4 *)Packet;
 
    bool ok = true;
 
@@ -32,7 +32,10 @@ void XCollDetVolDef::OnPacketReceived(CigiBasePacket *Packet)
    printf("EntityID ==> %d\n",InPckt->GetEntityID());
    printf("VolID ==> %d\n",InPckt->GetVolID());
    printf("VolEn ==> %d\n",InPckt->GetVolEn());
-   printf("VolType ==> %d\n",InPckt->GetVolType());
+	if( InPckt->GetVolType() == 0 ) 
+	   printf("VolType ==> 0: Sphere\n");
+	else 
+	   printf("VolType ==> 1: Cubiod\n");
    printf("Xoff ==> %f\n",InPckt->GetXoff());
    printf("Yoff ==> %f\n",InPckt->GetYoff());
    printf("Zoff ==> %f\n",InPckt->GetZoff());

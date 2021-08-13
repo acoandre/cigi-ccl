@@ -56,13 +56,20 @@
  *  06/23/2006 Greg Basler                       Version 1.7.1
  *  Changed native char and unsigned char types to CIGI types Cigi_int8 and 
  *  Cigi_uint8.
+ *
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *  04/08/2021 Paul Slade                         Version 4.0.6b
+ *	Fixed the callbacks/event processing for unrecognized and unhandled packets.
+ *	Was previously using packet IDs 0 and 256 for these which are reserved in CIGI 4.0.
+ *	Also the unhandled callback was never getting called previously.
+*
  * </pre>
  *  Author: The Boeing Company
  *
  */
 
-#if !defined(_CIGI_INCOMING_MESSAGE_INCLUDED_)
-#define _CIGI_INCOMING_MESSAGE_INCLUDED_
+#if !defined(_CIGI_INCOMING_MESSAGE_INCLUDED_V4)
+#define _CIGI_INCOMING_MESSAGE_INCLUDED_V4
 
 #include <stdlib.h>
 #include "CigiMessage.h"
@@ -93,6 +100,12 @@ class CIGI_SPEC CigiIncomingMsg : public CigiMessage
 
 public:
 
+    enum {
+	NumPacketTypes = 0x10000,
+	UnrecognizedPacket = NumPacketTypes,
+	UnhandledPacket = UnrecognizedPacket+1,
+	TotalPacketTypes = UnhandledPacket+1
+    };
 
    //==> Management
 
@@ -261,7 +274,7 @@ public:
    //!
    int RegisterUnrecognizedPacketEvent(CigiBaseEventProcessor *EventMgr)
    {
-   	return(RegisterEventProcessor(0,EventMgr));
+   	return(RegisterEventProcessor(UnrecognizedPacket,EventMgr));
    }
 
    //=========================================================
@@ -274,7 +287,7 @@ public:
    //!
    int UnregisterUnrecognizedPacketEvent(CigiBaseEventProcessor *EventMgr)
    {
-      return(UnregisterEventProcessor(0,EventMgr));
+      return(UnregisterEventProcessor(UnrecognizedPacket,EventMgr));
    }
 
 
@@ -286,9 +299,9 @@ public:
    //! \return This returns CIGI_SUCCESS or an error code 
    //!   defined in CigiErrorCodes.h
    //!
-   int RegisterUnrecognizedPacketCallBack(CigiCBProcessor CallBack)
+    int RegisterUnrecognizedPacketCallBack(CigiCBProcessor CallBack)
    {
-      return(RegisterCallBack(0,CallBack));
+      return(RegisterCallBack(UnrecognizedPacket,CallBack));
    }
 
    //=========================================================
@@ -301,7 +314,7 @@ public:
    //!
    int UnregisterUnrecognizedPacketCallBack(CigiCBProcessor CallBack)
    {
-      return(UnregisterCallBack(0,CallBack));
+      return(UnregisterCallBack(UnrecognizedPacket,CallBack));
    }
 
    //=========================================================
@@ -314,7 +327,7 @@ public:
    //!
    int RegisterUnhandledPacketEvent(CigiBaseEventProcessor *EventMgr)
    {
-   	return(RegisterEventProcessor(256,EventMgr));
+   	return(RegisterEventProcessor(UnhandledPacket,EventMgr));
    }
 
    //=========================================================
@@ -327,7 +340,7 @@ public:
    //!
    int UnregisterUnhandledPacketEvent(CigiBaseEventProcessor *EventMgr)
    {
-      return(UnregisterEventProcessor(256,EventMgr));
+      return(UnregisterEventProcessor(UnhandledPacket,EventMgr));
    }
 
 
@@ -341,7 +354,7 @@ public:
    //!
    int RegisterUnhandledPacketCallBack(CigiCBProcessor CallBack)
    {
-      return(RegisterCallBack(256,CallBack));
+      return(RegisterCallBack(UnhandledPacket,CallBack));
    }
 
    //=========================================================
@@ -354,7 +367,7 @@ public:
    //!
    int UnregisterUnhandledPacketCallBack(CigiCBProcessor CallBack)
    {
-      return(UnregisterCallBack(256,CallBack));
+      return(UnregisterCallBack(UnhandledPacket,CallBack));
    }
 
 
@@ -491,6 +504,18 @@ public:
    int GetReaderCigiMinorVersion(void) const { return(ReaderVersion.CigiMinorVersion); }
 
 
+   //=========================================================
+   //! Gets the Cigi Major Version of the packets being received.
+   //! \return the Cigi Major Version of the packets being received.
+   //!
+   int GetIncomingCigiMajorVersion() const { return(ProcessingVersion.CigiMajorVersion); }
+
+   //=========================================================
+   //! Gets the Cigi Minor Version of the packets being received.
+   //! \return the Cigi Minor Version of the packets being received.
+   //!
+   int GetIncomingCigiMinorVersion() const { return(ProcessingVersion.CigiMinorVersion); }
+
    //+> Registering
 
    //=========================================================
@@ -505,11 +530,10 @@ public:
    //! \return the a flag specifying whether the specified
    //!   packet is valid to send.
    //!
-	int RegisterUserPacket(CigiBasePacket *Packet,
-                          Cigi_uint8 PacketID,
+   virtual int RegisterUserPacket(CigiBasePacket *Packet,
+                          Cigi_uint16 PacketID,
                           bool HostSend,
                           bool IGSend);
-
 
 
 protected:
@@ -542,13 +566,13 @@ protected:
    //! EventList<br>
    //! The table of Event lists.
    //!
-   list<CigiBaseEventProcessor *>EventList[257];
+   list<CigiBaseEventProcessor *>EventList[TotalPacketTypes];
 
    //=========================================================
    //! CallBackList<br>
    //! The table of Callback lists.
    //!
-   list<CigiCBProcessor>CallBackList[257];
+   list<CigiCBProcessor>CallBackList[TotalPacketTypes];
 
    //=========================================================
    //! SignalList<br>
@@ -584,13 +608,13 @@ protected:
    //=========================================================
    //! The Conversion Table for managers of incoming packets
    //!
-   CigiBasePacket *IncomingHandlerTbl[256];
+   CigiBasePacket *IncomingHandlerTbl[NumPacketTypes];
 
    //=========================================================
    //! The Table containing the Signal Type of the packet
    //!  for managers of incoming packets.
    //!
-   CigiSignalType::Type SignalTbl[256];
+   CigiSignalType::Type SignalTbl[TotalPacketTypes];
 
    //=========================================================
    //! A pointer to the default packet used to unpack
@@ -609,7 +633,7 @@ protected:
    //! \param Packet - A pointer to the packet object that has
    //!    parsed the current message packet.
    //!
-   bool SignalJump(const Cigi_uint8 PacketID, CigiBasePacket *Packet);
+   bool SignalJump(const Cigi_uint16 PacketID, CigiBasePacket *Packet);
 
    //=========================================================
    //! Clear the Processing Table
@@ -656,6 +680,18 @@ protected:
 	void SetIncomingIGV3Tbls(void);
 
    //=========================================================
+   //! Sets the external interface tables to Host output with
+   //!   Cigi Version 3 packets
+   //!
+	void SetIncomingHostV4Tbls(void);
+
+   //=========================================================
+   //! Sets the external interface tables to IG output with
+   //!   Cigi Version 3 packets
+   //!
+	void SetIncomingIGV4Tbls(void);
+
+   //=========================================================
    //! Sets the external interface tables to IG output with
    //!   Cigi Version 3 packets
    //!
@@ -664,4 +700,4 @@ protected:
 
 };
 
-#endif // !defined(_CIGI_INCOMING_MESSAGE_INCLUDED_)
+#endif // !defined(_CIGI_INCOMING_MESSAGE_INCLUDED_V4)

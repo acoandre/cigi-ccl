@@ -88,15 +88,21 @@ CigiTrajectoryDefV1::CigiTrajectoryDefV1()
    MinorVersion = 0;
 
    EntityID = 0;
+   ArtPartID = 0;
    Accel = 0.0;
    RetardationRate = 0.0;
    TermVel = 0.0;
-   Xoff = 0.0;
-   Yoff = 0.0;
-   Zoff = 0.0;
-   AccelX = 0.0;
-   AccelY = 0.0;
-   AccelZ = 0.0;
+   AccelX = 0.0f;
+   AccelY = 0.0f;
+   AccelZ = 0.0f;
+   AccelRoll = 0.0;
+   AccelPitch = 0.0;
+   AccelYaw = 0.0;
+   Xoff = 0.0f;
+   Yoff = 0.0f;
+   Zoff = 0.0f;
+   CoordSys = World;
+   ArtPartApplyEn = false;
 
 }
 
@@ -127,8 +133,8 @@ int CigiTrajectoryDefV1::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Sp
 
    CDta.d = DBuf;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    CIGI_SCOPY2(CDta.s++, &Data->EntityID);
    CIGI_SCOPY4(CDta.f++, &Data->Accel);

@@ -38,6 +38,15 @@
  *  04/03/2008 Greg Basler                       Version 2.1.0
  *  Fixed the signals and added symbol signals
  *
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  OnVelocityCtrl, OnAccelerationCtrl, OnSymbolPolygonDef,
+ *  OnSymbolTexturedCircleDef, OnSymbolTexturedPolygonDef,
+ *  OnAnimationControl
+ *
+ *  07/25/2019 Chas Whitley                      Version 4.0.2
+ *  Added OnEntityPositionCtrl
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -435,6 +444,74 @@ public:
    //!   implement this call.
    //!
    virtual void OnWeatherCtrl(CigiBasePacket *Packet) { };
+
+   //=========================================================
+   //! OnVelocityCtrl<br>
+   //! A base function to process incoming velocity Control packets.<br>
+   //! This function does nothing in this base class.<br>
+   //! If processing is required, the inheriting class must
+   //!   implement this call.
+   //!
+   virtual void OnVelocityCtrl(CigiBasePacket *Packet) { };
+
+   //=========================================================
+   //! OnAccelerationCtrl<br>
+   //! A base function to process incoming acceleration Control packets.<br>
+   //! This function does nothing in this base class.<br>
+   //! If processing is required, the inheriting class must
+   //!   implement this call.
+   //!
+   virtual void OnAccelerationCtrl(CigiBasePacket *Packet) { };
+
+   //=========================================================
+   //! OnSymbolPolygonDef<br>
+   //! A base function to process incoming Symbol Polygon 
+   //! Definition Control packets.<br>
+   //! This function does nothing in this base class.<br>
+   //! If processing is required, the inheriting class must
+   //!   implement this call.
+   //!
+   virtual void OnSymbolPolygonDef(CigiBasePacket *Packet) { };
+
+   //=========================================================
+   //! OnSymbolTexturedCircleDef<br>
+   //! A base function to process incoming Symbol Textured Circle 
+   //! Definition Control packets.<br>
+   //! This function does nothing in this base class.<br>
+   //! If processing is required, the inheriting class must
+   //!   implement this call.
+   //!
+   virtual void OnSymbolTexturedCircleDef(CigiBasePacket *Packet) { };
+
+   //=========================================================
+   //! OnSymbolTexturedPolygonDef<br>
+   //! A base function to process incoming Symbol Textured
+   //! Polygon Definition Control packets.<br>
+   //! This function does nothing in this base class.<br>
+   //! If processing is required, the inheriting class must
+   //!   implement this call.
+   //!
+   virtual void OnSymbolTexturedPolygonDef(CigiBasePacket *Packet) { };
+
+   //=========================================================
+   //! OnEntityPositionCtrl<br>
+   //! A base function to process incoming Animation Control 
+   //! packets.<br>
+   //! This function does nothing in this base class.<br>
+   //! If processing is required, the inheriting class must
+   //!   implement this call.
+   //!
+   virtual void OnEntityPositionCtrl(CigiBasePacket *Packet) { };
+
+   //=========================================================
+   //! OnAnimationControl<br>
+   //! A base function to process incoming Symbol Textured
+   //! Polygon Definition Control packets.<br>
+   //! This function does nothing in this base class.<br>
+   //! If processing is required, the inheriting class must
+   //!   implement this call.
+   //!
+   virtual void OnAnimationControl(CigiBasePacket *Packet) { };
 
 
    //==+> IG to Host

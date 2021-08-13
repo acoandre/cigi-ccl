@@ -43,6 +43,9 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -61,14 +64,19 @@
 #define CIGI_WEATHER_COND_RESP_PACKET_ID_V3 109
 #define CIGI_WEATHER_COND_RESP_PACKET_SIZE_V3 32
 
+#define CIGI_WEATHER_COND_RESP_PACKET_ID_V4 0x0ff8
+#define CIGI_WEATHER_COND_RESP_PACKET_SIZE_V4 32
+
 
 class CigiWeatherCondRespV3;
+class CigiWeatherCondRespV4;
 
 
 class CIGI_SPEC CigiBaseWeatherCondResp : public CigiBasePacket
 {
 
 friend class CigiWeatherCondRespV3;
+friend class CigiWeatherCondRespV4;
 
 public:
 

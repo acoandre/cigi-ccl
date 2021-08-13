@@ -37,6 +37,8 @@
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Added new version conversion method.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -89,10 +91,15 @@ int CigiBaseMotionTrackCtrl::GetCnvt(CigiVersionID &CnvtVersion,
       CnvtInfo.ProcID = CigiProcessType::ProcNone;
       CnvtInfo.CnvtPacketID = 0;
    }
-   else
+   else if(CnvtVersion.CigiMajorVersion < 4)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcStd;
       CnvtInfo.CnvtPacketID = CIGI_MOTION_TRACK_CTRL_PACKET_ID_V3;
+   }
+   else
+   {
+      CnvtInfo.ProcID = CigiProcessType::ProcStd;
+      CnvtInfo.CnvtPacketID = CIGI_MOTION_TRACK_CTRL_PACKET_ID_V4;
    }
    return(CIGI_SUCCESS);
 }

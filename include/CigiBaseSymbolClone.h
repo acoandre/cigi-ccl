@@ -31,6 +31,8 @@
  *  04/03/2008 Greg Basler                       CIGI_SYM_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -49,8 +51,12 @@
 #define CIGI_SYMBOL_CLONE_PACKET_ID_V3_3 33
 #define CIGI_SYMBOL_CLONE_PACKET_SIZE_V3_3 8
 
+#define CIGI_SYMBOL_CLONE_PACKET_ID_V4 0x20
+#define CIGI_SYMBOL_CLONE_PACKET_SIZE_V4 16
+
 
 class CigiSymbolCloneV3_3;
+class CigiSymbolCloneV4;
 
 
 //=========================================================
@@ -61,6 +67,7 @@ class CIGI_SPEC CigiBaseSymbolClone :
 {
 
    friend class CigiSymbolCloneV3_3;
+   friend class CigiSymbolCloneV4;
 
 public:
 

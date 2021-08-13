@@ -6,7 +6,7 @@
 #define _PROC_XConfClampEntityCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiConfClampEntityCtrlV3.h"
+#include "CigiConfClampEntityCtrlV4.h"
 
 class XConfClampEntityCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiConfClampEntityCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiConfClampEntityCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiConfClampEntityCtrlV3 *TPckt;
+   CigiConfClampEntityCtrlV4 *TPckt;
 
 };
 

@@ -30,6 +30,8 @@
  *
  *  03/11/2008 Greg Basler                       CIGI_SYM_1
  *  Initial Release.
+ *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
  *
  * </pre>
  *  Author: The Boeing Company
@@ -49,8 +51,12 @@
 #define CIGI_SYMBOL_SURFACE_DEF_PACKET_ID_V3_3 29
 #define CIGI_SYMBOL_SURFACE_DEF_PACKET_SIZE_V3_3 56
 
+#define CIGI_SYMBOL_SURFACE_DEF_PACKET_ID_V4 0x1c
+#define CIGI_SYMBOL_SURFACE_DEF_PACKET_SIZE_V4 64
+
 
 class CigiSymbolSurfaceDefV3_3;
+class CigiSymbolSurfaceDefV4;
 
 
 //=========================================================
@@ -61,6 +67,7 @@ class CIGI_SPEC CigiBaseSymbolSurfaceDef :
 {
 
    friend class CigiSymbolSurfaceDefV3_3;
+   friend class CigiSymbolSurfaceDefV4;
 
 public:
 

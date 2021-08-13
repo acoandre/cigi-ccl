@@ -49,6 +49,10 @@
  *  Added Extrapolation or Interpolation Smoothing flag and
  *  initialize it to false.
  *
+ *  12/13/2018 Paul Slade                       Version 4.0.2
+ *  Fixes required to allow correct version conversion
+ *  Moved accessors that are not supported in V4 packet out of base class *
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -98,6 +102,7 @@ CigiEntityCtrlV1::CigiEntityCtrlV1()
    Alpha = 255;
    Opacity = 100.0f;
    Temperature = 0.0f;
+   ExtendedEntityType = Short;
 
    Roll = 0.0f;
    Pitch = 0.0f;
@@ -154,8 +159,8 @@ int CigiEntityCtrlV1::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec)
 
    CDta.c = tBuf;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
    CIGI_SCOPY2(CDta.s++, &Data->EntityID);
    
    Cigi_uint8 HDta = (Cigi_uint8)(((Data->AttachState << 6) & 0x40) |
@@ -392,3 +397,114 @@ CigiEntityCtrlV1::EffectStateGrp CigiEntityCtrlV1::GetEffectState() const
 
 }
 
+
+// ================================================
+// SetPitch
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int CigiEntityCtrlV1::SetPitch(const float PitchIn, bool bndchk)
+{
+
+#ifndef CIGI_NO_BND_CHK
+    if (bndchk && ((PitchIn < -90.0f) || (PitchIn > 90.0f)))
+    {
+#ifndef CIGI_NO_EXCEPT
+	throw CigiValueOutOfRangeException("Pitch", (double)PitchIn, -90.0, 90.0);
+#endif
+	return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
+    }
+#endif
+
+    Pitch = PitchIn;
+
+    return(CIGI_SUCCESS);
+
+}
+
+// ================================================
+// SetRoll
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int CigiEntityCtrlV1::SetRoll(const float RollIn, bool bndchk)
+{
+
+#ifndef CIGI_NO_BND_CHK
+    if (bndchk && ((RollIn < -180.0f) || (RollIn > 180.0f)))
+    {
+#ifndef CIGI_NO_EXCEPT
+	throw CigiValueOutOfRangeException("Roll", (double)RollIn, -180.0, 180.0);
+#endif
+	return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
+    }
+#endif
+
+    Roll = RollIn;
+
+    return(CIGI_SUCCESS);
+
+}
+
+// ================================================
+// SetLat
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int CigiEntityCtrlV1::SetLat(const double Lat, bool bndchk)
+{
+
+#ifndef CIGI_NO_BND_CHK
+    if (bndchk && ((Lat < -90.0f) || (Lat > 90.0f)))
+    {
+#ifndef CIGI_NO_EXCEPT
+	throw CigiValueOutOfRangeException("Lat", Lat, -90.0, 90.0);
+#endif
+	return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
+    }
+#endif
+
+    LatOrXoff = Lat;
+
+    return(CIGI_SUCCESS);
+
+}
+
+// ================================================
+// SetLon
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int CigiEntityCtrlV1::SetLon(const double Lon, bool bndchk)
+{
+
+#ifndef CIGI_NO_BND_CHK
+    if (bndchk && ((Lon < -180.0f) || (Lon > 180.0f)))
+    {
+#ifndef CIGI_NO_EXCEPT
+	throw CigiValueOutOfRangeException("Lon", Lon, -180.0, 180.0);
+#endif
+	return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
+    }
+#endif
+
+    LonOrYoff = Lon;
+
+    return(CIGI_SUCCESS);
+
+}
+
+
+// ================================================
+// SetAttachState
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int CigiEntityCtrlV1::SetAttachState(const AttachStateGrp AttachStateIn, bool bndchk)
+{
+
+#ifndef CIGI_NO_BND_CHK
+    if (bndchk && ((AttachStateIn < 0) || (AttachStateIn > 1)))
+    {
+#ifndef CIGI_NO_EXCEPT
+	throw CigiValueOutOfRangeException("AttachState", AttachStateIn, 0, 1);
+#endif
+	return(CIGI_ERROR_VALUE_OUT_OF_RANGE);
+    }
+#endif
+
+    AttachState = AttachStateIn;
+
+    return(CIGI_SUCCESS);
+
+}

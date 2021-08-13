@@ -43,6 +43,9 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -61,14 +64,19 @@
 #define CIGI_MARITIME_SURFACE_RESP_PACKET_ID_V3 111
 #define CIGI_MARITIME_SURFACE_RESP_PACKET_SIZE_V3 16
 
+#define CIGI_MARITIME_SURFACE_RESP_PACKET_ID_V4 0x0ff6
+#define CIGI_MARITIME_SURFACE_RESP_PACKET_SIZE_V4 24
+
 
 class CigiMaritimeSurfaceRespV3;
+class CigiMaritimeSurfaceRespV4;
 
 
 class CIGI_SPEC CigiBaseMaritimeSurfaceResp : public CigiBasePacket
 {
 
 friend class CigiMaritimeSurfaceRespV3;
+friend class CigiMaritimeSurfaceRespV4;
 
 public:
 

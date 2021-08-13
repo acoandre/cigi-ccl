@@ -55,6 +55,6 @@ DefaultProc::~DefaultProc()
 void DefaultProc::OnPacketReceived(CigiBasePacket *Packet)
 {
    unsigned char *buff = ((CigiDefaultPacket *)Packet)->GetDataPtr();
-   cout << "Received an Umsupported packet: id " << hex << (int *)buff << endl;
+   cout << "Received an Unsupported packet: id " << hex << (int *)buff << endl;
 }
 

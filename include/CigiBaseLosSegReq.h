@@ -62,6 +62,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  The Boeing Company
  *
@@ -89,11 +91,15 @@
 #define CIGI_LOS_SEG_REQ_PACKET_ID_V3_2 25
 #define CIGI_LOS_SEG_REQ_PACKET_SIZE_V3_2 64
 
+#define CIGI_LOS_SEG_REQ_PACKET_ID_V4 0x18
+#define CIGI_LOS_SEG_REQ_PACKET_SIZE_V4 72
+
 
 class CigiLosSegReqV1;
 class CigiLosSegReqV2;
 class CigiLosSegReqV3;
 class CigiLosSegReqV3_2;
+class CigiLosSegReqV4;
 
 
 class CIGI_SPEC CigiBaseLosSegReq : public CigiBasePacket
@@ -103,6 +109,7 @@ friend class CigiLosSegReqV1;
 friend class CigiLosSegReqV2;
 friend class CigiLosSegReqV3;
 friend class CigiLosSegReqV3_2;
+friend class CigiLosSegReqV4;
 
 public:
 

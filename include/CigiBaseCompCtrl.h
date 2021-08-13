@@ -48,6 +48,11 @@
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *
+ *  12/12/2018 Paul Slade                      Version 4.0.2
+ *  Removed CompClassV4 (must now use CompClassV3 instead) to allow correct version conversion
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -78,9 +83,14 @@
 #define CIGI_COMP_CTRL_PACKET_ID_V3_3 4
 #define CIGI_COMP_CTRL_PACKET_SIZE_V3_3 32
 
+#define CIGI_COMP_CTRL_PACKET_ID_V4 3
+#define CIGI_COMP_CTRL_PACKET_SIZE_V4 40
+
 #define CIGI_SHORT_COMP_CTRL_PACKET_ID_V3_3 5
 #define CIGI_SHORT_COMP_CTRL_PACKET_SIZE_V3_3 16
 
+#define CIGI_SHORT_COMP_CTRL_PACKET_ID_V4 0x04
+#define CIGI_SHORT_COMP_CTRL_PACKET_SIZE_V4 24
 
 
 class CigiCompCtrlV1;
@@ -89,6 +99,8 @@ class CigiCompCtrlV3;
 class CigiShortCompCtrlV3;
 class CigiCompCtrlV3_3;
 class CigiShortCompCtrlV3_3;
+class CigiCompCtrlV4;
+class CigiShortCompCtrlV4;
 
 
 class CIGI_SPEC CigiBaseCompCtrl : public CigiBasePacket
@@ -100,6 +112,8 @@ friend class CigiCompCtrlV3;
 friend class CigiShortCompCtrlV3;
 friend class CigiCompCtrlV3_3;
 friend class CigiShortCompCtrlV3_3;
+friend class CigiCompCtrlV4;
+friend class CigiShortCompCtrlV4;
 
 public:
 
@@ -150,6 +164,31 @@ public:
       SystemV3=13,
       SymbolSurfaceV3_3=14,
       SymbolV3_3=15
+   };
+
+   //=========================================================
+   //! The enumeration for the CigiBaseCompCtrl Group
+   //! Paul Slade - retaining this enum eben though only CompClassV3Grp is required just to minimize impact on users that already use this
+   //!
+   enum CompClassV4Grp
+   {
+      NoCnvtV4=-1,
+      EntityV4=0,
+      ViewV4=1,
+      ViewGrpV4=2,
+      SensorV4=3,
+      RegionalSeaSurfaceV4=4,
+      RegionalTerrainSurfaceV4=5,
+      RegionalLayeredWeatherV4=6,
+      GlobalSeaSurfaceV4=7,
+      GlobalTerrainSurfaceV4=8,
+      GlobalLayeredWeatherV4=9,
+      AtmosphereV4=10,
+      CelestialSphereV4=11,
+      EventV4=12,
+      SystemV4=13,
+      SymbolSurfaceV4=14,
+      SymbolV4=15
    };
 
    //=========================================================

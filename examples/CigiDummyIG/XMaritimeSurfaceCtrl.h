@@ -6,7 +6,7 @@
 #define _PROC_XMaritimeSurfaceCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiMaritimeSurfaceCtrlV3.h"
+#include "CigiMaritimeSurfaceCtrlV4.h"
 
 class XMaritimeSurfaceCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiMaritimeSurfaceCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiMaritimeSurfaceCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiMaritimeSurfaceCtrlV3 *TPckt;
+   CigiMaritimeSurfaceCtrlV4 *TPckt;
 
 };
 

@@ -60,6 +60,11 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                       Version 4.0.0
+ *
+ *  12/12/2018 Paul Slade                      Version 4.0.2
+ *  Removed TimeStampV4 (must now use TimeStampV3 instead) to allow correct version conversion
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -87,11 +92,14 @@
 #define CIGI_SOF_PACKET_ID_V3_2 101
 #define CIGI_SOF_PACKET_SIZE_V3_2 24
 
+#define CIGI_SOF_PACKET_ID_V4 0xffff
+#define CIGI_SOF_PACKET_SIZE_V4 24
 
 class CigiSOFV1;
 class CigiSOFV2;
 class CigiSOFV3;
 class CigiSOFV3_2;
+class CigiSOFV4;
 
 
 //=========================================================
@@ -105,6 +113,7 @@ friend class CigiSOFV1;
 friend class CigiSOFV2;
 friend class CigiSOFV3;
 friend class CigiSOFV3_2;
+friend class CigiSOFV4;
 
 public:
 
@@ -394,7 +403,26 @@ protected:
    //!
    bool TimestampValid;
 
+   //=========================================================
+   //! IG Condition - Overframing<br>
+   //!  0 - Not Present<br>
+   //!  1 - Present<br>
+   //!
+   Cigi_uint8 OverframingCondition;
 
+   //=========================================================
+   //! IG Condition - Paging<br>
+   //!  0 - Not Present<br>
+   //!  1 - Present<br>
+   //!
+   Cigi_uint8 PagingCondition;
+
+   //=========================================================
+   //! IG Condition - Excessive Variable Length Data<br>
+   //!  0 - Not Present<br>
+   //!  1 - Present<br>
+   //!
+   Cigi_uint8 ExcessVarLenDataCondition;
 
 };
 

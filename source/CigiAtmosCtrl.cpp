@@ -44,6 +44,9 @@
  *  06/23/2006 Greg Basler                       Version 1.7.1
  *  Changed native char and unsigned char types to CIGI types Cigi_int8 and 
  *  Cigi_uint8.
+ *
+ *  01/23/2019 Paul Slade                       Version 4.0.2
+ *  Added GetCnvt() to allow conversion between V3 and V4
  * </pre>
  *  Author: The Boeing Company
  *
@@ -74,6 +77,7 @@ CigiAtmosCtrlV3::CigiAtmosCtrlV3()
 
    Hour = 0;
    Minute = 0;
+   Seconds = 0.0;
    Month = 1;
    Day = 1;
    Year = 2000;
@@ -123,8 +127,8 @@ int CigiAtmosCtrlV3::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) 
 
    CDta.c = Buff;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    *CDta.c++ = (Data->AtmosEn) ? 0x01 : 0;
 
@@ -197,6 +201,31 @@ int CigiAtmosCtrlV3::Unpack(Cigi_uint8 * Buff, bool Swap, void *Spec)
 
 }
 
+
+// ================================================
+// GetCnvt
+// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+int CigiAtmosCtrlV3::GetCnvt(CigiVersionID &CnvtVersion,
+    CigiCnvtInfoType::Type &CnvtInfo)
+{
+    CnvtInfo.ProcID = CigiProcessType::ProcStd;
+
+    // Prior to V3 must use EnvCtrl packet
+    if (CnvtVersion.CigiMajorVersion < 3) {
+	CnvtInfo.ProcID = CigiProcessType::ProcEnvCtrl;
+	CnvtInfo.CnvtPacketID = 0;
+    }
+    else if (CnvtVersion.CigiMajorVersion < 4) {
+	CnvtInfo.ProcID = CigiProcessType::ProcStd;
+	CnvtInfo.CnvtPacketID = CIGI_ATMOS_CTRL_PACKET_ID_V3;
+    }
+    else {
+	CnvtInfo.ProcID = CigiProcessType::ProcStd;
+	CnvtInfo.CnvtPacketID = CIGI_ATMOS_CTRL_PACKET_ID_V4;
+    }
+
+    return(CIGI_SUCCESS);
+}
 
 
 // ====================================================================

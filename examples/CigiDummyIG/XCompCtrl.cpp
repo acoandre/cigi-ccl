@@ -25,7 +25,7 @@ XCompCtrl::~XCompCtrl()
 
 void XCompCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiCompCtrlV3 *InPckt = (CigiCompCtrlV3 *)Packet;
+   CigiCompCtrlV4 *InPckt = (CigiCompCtrlV4 *)Packet;
 
    bool ok = true;
 
@@ -33,7 +33,7 @@ void XCompCtrl::OnPacketReceived(CigiBasePacket *Packet)
 
    printf("CompID ==> %d\n",InPckt->GetCompID());
    printf("InstanceID ==> %d\n",InPckt->GetInstanceID());
-   printf("CompClassV3 ==> %d\n",InPckt->GetCompClassV3());
+   printf("CompClassV4 ==> %d\n",InPckt->GetCompClassV4());
    printf("CompState ==> %d\n",InPckt->GetCompState());
    printf("CompData ==> %d\n",InPckt->GetLongCompData(0));
    printf("CompData ==> %d\n",InPckt->GetLongCompData(1));

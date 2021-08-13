@@ -50,7 +50,10 @@
  *  
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Added new version conversion method.
- *  
+ *
+ *  12/14/2018 Paul Slade                       Version 4.0.2
+ *  Fixed GetCnvt for Cigi4
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -136,8 +139,8 @@ int CigiHatRespV2::Pack(CigiBasePacket * Base, Cigi_uint8 * Buff, void *Spec) co
 
    CDta.d = DBuf;
 
-   *CDta.c++ = PacketID;
-   *CDta.c++ = PacketSize;
+   *CDta.c++ = ( Cigi_uint8 ) PacketID;
+   *CDta.c++ = ( Cigi_uint8 ) PacketSize;
 
    CIGI_SCOPY2(CDta.s++, &Data->HatHotID);
 
@@ -213,8 +216,24 @@ int CigiHatRespV2::GetCnvt(CigiVersionID &CnvtVersion,
 {
    CnvtInfo.ProcID = CigiProcessType::ProcStd;
 
-   // Note: All HAT and HAT/HOT resp have the same ID
-   CnvtInfo.CnvtPacketID = CIGI_HAT_HOT_RESP_PACKET_ID_V3;
+
+   switch (CnvtVersion.CigiMajorVersion)
+   {
+   case 1:
+       CnvtInfo.CnvtPacketID = CIGI_HAT_RESP_PACKET_ID_V1;
+       break;
+   case 2:
+       CnvtInfo.CnvtPacketID = CIGI_HAT_RESP_PACKET_ID_V2;
+       break;
+   case 3:
+       CnvtInfo.CnvtPacketID = CIGI_HAT_HOT_RESP_PACKET_ID_V3;
+       break;
+   default:
+       // The Packet ID for all V3 HatHotReq are the same ID
+       CnvtInfo.CnvtPacketID = CIGI_HAT_HOT_RESP_PACKET_ID_V4;
+       break;
+   }
+
 
    return(CIGI_SUCCESS);
 }

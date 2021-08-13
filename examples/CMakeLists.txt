@@ -1,0 +1,3 @@
+add_subdirectory(TinyXML)
+add_subdirectory(CIGIDummyIG)
+add_subdirectory(CIGIMiniHost)

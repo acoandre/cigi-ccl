@@ -46,6 +46,9 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -70,14 +73,22 @@
 #define CIGI_SENSOR_RESP_PACKET_ID_V3 106
 #define CIGI_SENSOR_RESP_PACKET_SIZE_V3 24
 
+#define CIGI_SENSOR_RESP_PACKET_ID_V4 0x0ffb
+#define CIGI_SENSOR_RESP_PACKET_SIZE_V4 24
+
 #define CIGI_SENSOR_XRESP_PACKET_ID_V3 107
 #define CIGI_SENSOR_XRESP_PACKET_SIZE_V3 48
+
+#define CIGI_SENSOR_XRESP_PACKET_ID_V4 0x0ffa
+#define CIGI_SENSOR_XRESP_PACKET_SIZE_V4 56
 
 
 class CigiSensorRespV1;
 class CigiSensorRespV2;
 class CigiSensorRespV3;
+class CigiSensorRespV4;
 class CigiSensorXRespV3;
+class CigiSensorXRespV4;
 
 
 class CIGI_SPEC CigiBaseSensorResp : public CigiBasePacket
@@ -86,7 +97,9 @@ class CIGI_SPEC CigiBaseSensorResp : public CigiBasePacket
 friend class CigiSensorRespV1;
 friend class CigiSensorRespV2;
 friend class CigiSensorRespV3;
+friend class CigiSensorRespV4;
 friend class CigiSensorXRespV3;
+friend class CigiSensorXRespV4;
 
 public:
 
@@ -375,7 +388,11 @@ protected:
    //!
    double TrackPntAlt;
 
-
+   //=========================================================
+   //! EntityIDValid<br>
+   //! The EntityIDValid flag.
+   //!
+   bool EntityIDValid;
 };
 
 #endif // #if !defined(_CIGI_BASE_SENSOR_RESP_INCLUDED_)

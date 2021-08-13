@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -70,14 +72,22 @@
 #define CIGI_ATMOS_CTRL_PACKET_ID_V3 10
 #define CIGI_ATMOS_CTRL_PACKET_SIZE_V3 32
 
+#define CIGI_ATMOS_CTRL_PACKET_ID_V4 0x09
+#define CIGI_ATMOS_CTRL_PACKET_SIZE_V4 32
+
 #define CIGI_CELESTIAL_CTRL_PACKET_ID_V3 9
 #define CIGI_CELESTIAL_CTRL_PACKET_SIZE_V3 16
+
+#define CIGI_CELESTIAL_CTRL_PACKET_ID_V4 0x08
+#define CIGI_CELESTIAL_CTRL_PACKET_SIZE_V4 24
 
 
 class CigiEnvCtrlV1;
 class CigiEnvCtrlV2;
 class CigiAtmosCtrlV3;
+class CigiAtmosCtrlV4;
 class CigiCelestialCtrlV3;
+class CigiCelestialCtrlV4;
 class CigiHoldEnvCtrl;
 
 
@@ -87,7 +97,9 @@ class CIGI_SPEC CigiBaseEnvCtrl : public CigiBasePacket
 friend class CigiEnvCtrlV1;
 friend class CigiEnvCtrlV2;
 friend class CigiAtmosCtrlV3;
+friend class CigiAtmosCtrlV4;
 friend class CigiCelestialCtrlV3;
+friend class CigiCelestialCtrlV4;
 friend class CigiHoldEnvCtrl;
 
 protected:
@@ -183,6 +195,12 @@ protected:
    Cigi_uint8 Minute;
 
    //=========================================================
+   //! Seconds<br>
+   //! The current seconds.
+   //!
+   float Seconds;
+
+   //=========================================================
    //! Month<br>
    //! The current month.
    //!
@@ -211,6 +229,12 @@ protected:
    //! The ephemeris model enable
    //!
    bool EphemerisEn;
+
+   //=========================================================
+   //! TimeOfDayEn<br>
+   //! The continuous time of day enable
+   //!
+   bool ContinuousTimeOfDayEn;
 
    //=========================================================
    //! SunEn<br>
@@ -289,8 +313,6 @@ protected:
    //! global barometric pressure
    //!
    float BaroPress;
-
-
 };
 
-#endif // #if !defined(_CIGI_BASE_ENV_CTRL_INCLUDED_)CL
+#endif // #if !defined(_CIGI_BASE_ENV_CTRL_INCLUDED_)

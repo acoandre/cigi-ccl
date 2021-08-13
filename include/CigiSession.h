@@ -49,6 +49,13 @@
  *  06/23/2006 Greg Basler                       Version 1.7.1
  *  Changed native char and unsigned char types to CIGI types Cigi_int8 and 
  *  Cigi_uint8.
+ *  
+ *  12/11/2018 Paul Slade                       Version 4.0.2
+ *  Switched RegisterUserPacket PacketID parameter from Cigi_uint8 to Cigi_uint16.
+ *
+ *  07/25/2019 Chas Whitley                     Version 4.0.3
+ *  Moved SessionTypeEnum to Public:
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -247,7 +254,7 @@ public:
    //!   defined in CigiErrorCodes.h
    //!
 	int RegisterUserPacket(CigiBasePacket *Packet,
-                          Cigi_uint8 PacketID,
+                          Cigi_uint16 PacketID,
                           bool HostSend, bool IGSend)
    {
       int outMsgStatus = OutMsg.RegisterUserPacket(Packet,PacketID,HostSend,IGSend);
@@ -283,6 +290,10 @@ public:
       return((SessionType == IG) ? true : false);
    }
 
+  //=========================================================
+   //! Session Type IG or Host<br>
+   //!
+   SessionTypeEnum SessionType;
 
 
 protected:
@@ -303,11 +314,6 @@ protected:
    //! Animation Table Object<br>
    //!
    CigiAnimationTable ATbl;
-
-   //=========================================================
-   //! Session Type IG or Host<br>
-   //!
-   SessionTypeEnum SessionType;
 
    //=========================================================
    //! A flag specifying whether this session is synchronous

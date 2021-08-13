@@ -6,7 +6,7 @@
 #define _PROC_XSensorCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiSensorCtrlV3.h"
+#include "CigiSensorCtrlV4.h"
 
 class XSensorCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiSensorCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiSensorCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiSensorCtrlV3 *TPckt;
+   CigiSensorCtrlV4 *TPckt;
 
 };
 

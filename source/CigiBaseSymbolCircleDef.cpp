@@ -31,6 +31,8 @@
  *  03/11/2008 Greg Basler                       CIGI_SYM_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -110,15 +112,20 @@ CigiBaseSymbolCircleDef & CigiBaseSymbolCircleDef::operator=(const CigiBaseSymbo
 int CigiBaseSymbolCircleDef::GetCnvt(CigiVersionID &CnvtVersion,
                                 CigiCnvtInfoType::Type &CnvtInfo)
 {
-   if(CnvtVersion.GetCombinedCigiVersion() < 0x303)
+   if(CnvtVersion.GetCombinedCigiVersion() < 0x0303)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcNone;
       CnvtInfo.CnvtPacketID = 0;
    }
-   else
+   else if(CnvtVersion.GetCombinedCigiVersion() < 0x0400)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcStd;
       CnvtInfo.CnvtPacketID = CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_ID_V3_3;
+   }
+   else
+   {
+      CnvtInfo.ProcID = CigiProcessType::ProcStd;
+      CnvtInfo.CnvtPacketID = CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_ID_V4;
    }
 
    return(CIGI_SUCCESS);
@@ -201,7 +208,7 @@ int CigiBaseSymbolCircleDef::SetStipplePatternLen(const float StipplePatternLenI
 // ================================================
 int CigiBaseSymbolCircleDef::GetCircleCount(void)
 {
-   return(Circles.size());
+   return( (int) Circles.size());
 }
 
 // ================================================
@@ -221,7 +228,7 @@ CigiBaseCircleSymbolData * CigiBaseSymbolCircleDef::GetCircle(int CircleIndex, b
       if(bndchk)
       {
 #ifndef CIGI_NO_EXCEPT
-         throw CigiValueOutOfRangeException("CircleIndex", (int)CircleIndex,0,Circles.size());
+         throw CigiValueOutOfRangeException("CircleIndex", (int) CircleIndex,0, (int) Circles.size());
 #endif
       }
 #endif

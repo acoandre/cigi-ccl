@@ -6,7 +6,7 @@
 #define _PROC_XViewCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiViewCtrlV3.h"
+#include "CigiViewCtrlV4.h"
 
 class XViewCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiViewCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiViewCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiViewCtrlV3 *TPckt;
+   CigiViewCtrlV4 *TPckt;
 
 };
 

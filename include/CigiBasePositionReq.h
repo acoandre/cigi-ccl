@@ -46,6 +46,8 @@
  *  Added new version conversion method.
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -64,10 +66,14 @@
 #define CIGI_POSITION_REQ_PACKET_ID_V3 27
 #define CIGI_POSITION_REQ_PACKET_SIZE_V3 8
 
+#define CIGI_POSITION_REQ_PACKET_ID_V4 0x1a
+#define CIGI_POSITION_REQ_PACKET_SIZE_V4 8
+
 
 class CigiPositionReqV1;
 class CigiPositionReqV2;
 class CigiPositionReqV3;
+class CigiPositionReqV4;
 
 
 class CIGI_SPEC CigiBasePositionReq : public CigiBasePacket
@@ -76,6 +82,7 @@ class CIGI_SPEC CigiBasePositionReq : public CigiBasePacket
 friend class CigiPositionReqV1;
 friend class CigiPositionReqV2;
 friend class CigiPositionReqV3;
+friend class CigiPositionReqV4;
 
 public:
 

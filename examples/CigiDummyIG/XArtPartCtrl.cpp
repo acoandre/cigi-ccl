@@ -23,7 +23,7 @@ XArtPartCtrl::~XArtPartCtrl()
 
 void XArtPartCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiArtPartCtrlV3 *InPckt = (CigiArtPartCtrlV3 *)Packet;
+   CigiArtPartCtrlV4 *InPckt = (CigiArtPartCtrlV4 *)Packet;
 
    printf("===> ArtPartCtrl <===\n");
 

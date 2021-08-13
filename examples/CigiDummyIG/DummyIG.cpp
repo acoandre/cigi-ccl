@@ -31,11 +31,14 @@
  *  
  *  03/29/2004 Andrew Sampson                       MPV_CR_DR_1
  *  Initial Release.
+ *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  Initial Release for CIGI 4.0 compatibility.
+ *
  * </pre>
  *  The Boeing Company
  *  1.0
  */
-
 
 #include "Network.h"  // network includes winsock2.h which must be included before windows.h
 
@@ -52,20 +55,35 @@
 // From CCL
 #include <CigiIGSession.h>
 #include <CigiExceptions.h>
-#include <CigiIGCtrlV3_2.h>
-#include <CigiSOFV3_2.h>
+#include "CigiSOFV4.h"
+#include "CigiHatHotRespV4.h"
+#include "CigiHatHotXRespV4.h"
+#include "CigiLosRespV4.h"
+#include "CigiLosXRespV4.h"
+#include "CigiSensorRespV4.h"
+#include "CigiSensorXRespV4.h"
+#include "CigiPositionRespV4.h"
+#include "CigiWeatherCondRespV4.h"
+#include "CigiAerosolRespV4.h"
+#include "CigiMaritimeSurfaceRespV4.h"
+#include "CigiTerrestrialSurfaceRespV4.h"
+#include "CigiCollDetSegRespV4.h"
+#include "CigiCollDetVolRespV4.h"
+#include "CigiAnimationStopV4.h"
+#include "CigiEventNotificationV4.h"
+#include "CigiIGMsgV4.h"
 
 // Handling routines
-#include "DefaultProc.h"
+//#include "DefaultProc.h"
 
 #include "XIGCtrl.h"
-#include "XEntityCtrl.h"
+#include "XEntityPositionCtrl.h"
 #include "XConfClampEntityCtrl.h"
 #include "XCompCtrl.h"
 #include "XShortCompCtrl.h"
 #include "XArtPartCtrl.h"
 #include "XShortArtPartCtrl.h"
-#include "XRateCtrl.h"
+#include "XVelocityCtrl.h"
 #include "XCelestialCtrl.h"
 #include "XAtmosCtrl.h"
 #include "XEnvRgnCtrl.h"
@@ -78,22 +96,26 @@
 #include "XMotionTrackCtrl.h"
 #include "XEarthModelDef.h"
 #include "XTrajectory.h"
+#include "XAccelerationCtrl.h"
 #include "XViewDef.h"
 #include "XCollDetSegDef.h"
 #include "XCollDetVolDef.h"
 #include "XHatHotReq.h"
 #include "XLosSegReq.h"
 #include "XLosVectReq.h"
-#include "XPostionReq.h"
+#include "XPositionReq.h"
 #include "XEnvCondReq.h"
-#include "XSymbolSurfaceDefV3_3.h"
-#include "XSymbolCtrlV3_3.h"
-#include "XShortSymbolCtrlV3_3.h"
-#include "XSymbolTextDefV3_3.h"
-#include "XSymbolCircleDefV3_3.h"
-#include "XSymbolLineDefV3_3.h"
-#include "XSymbolCloneV3_3.h"
-
+#include "XSymbolSurfaceDefV4.h"
+#include "XSymbolCtrlV4.h"
+#include "XShortSymbolCtrlV4.h"
+#include "XSymbolTextDefV4.h"
+#include "XSymbolCircleDefV4.h"
+#include "XSymbolPolygonDefV4.h"
+#include "XSymbolCloneV4.h"
+#include "XSymbolTexturedCircleDefV4.h"
+#include "XSymbolTexturedPolygonDefV4.h"
+#include "XEntityCtrl.h"
+#include "XAnimationCtrl.h"
 
 // System includes
 #include <stdio.h>
@@ -104,6 +126,38 @@
 #ifdef WIN32
 #include <Windows.h>
 #include <conio.h>
+#else
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+static int _kbhit(void)
+{
+	struct termios oldt, newt;
+	int ch;
+	int oldf;
+
+	tcgetattr(STDIN_FILENO, &oldt);
+	newt = oldt;
+	newt.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+	oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+	fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+	ch = getchar();
+
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+	fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+	if(ch != EOF)
+	{
+		ungetc(ch, stdin);
+		return 1;
+	}
+
+	return 0;
+}
 #endif
 
 #ifdef WIN32
@@ -137,17 +191,35 @@ Network network;
 static CigiIGSession *IGSn;
 static CigiOutgoingMsg *OmsgPtr;
 static CigiIncomingMsg *ImsgPtr;
-static DefaultProc DefaultPckt;
-static CigiSOFV3_2 CSOF;
+//static DefaultProc DefaultPckt;
+
+static CigiSOFV4 check_SOF;
+static CigiSOFV4 CSOF;
+static CigiHatHotRespV4 HatHotResp;
+static CigiHatHotXRespV4 HatHotXResp;
+static CigiLosRespV4 LosResp;
+static CigiLosXRespV4 LosXResp;
+static CigiSensorRespV4 SensorResp;
+static CigiSensorXRespV4 SensorXResp;
+static CigiPositionRespV4 PositionResp;
+static CigiWeatherCondRespV4 WeatherCondResp;
+static CigiAerosolRespV4 AerosolResp;
+static CigiMaritimeSurfaceRespV4 MaritimeSurfaceResp;
+static CigiTerrestrialSurfaceRespV4 TerrestrialSurfaceResp;
+static CigiCollDetSegRespV4 CollDetSegResp;
+static CigiCollDetVolRespV4 CollDetVolResp;
+static CigiAnimationStopV4 AnimationStop;
+static CigiEventNotificationV4 EventNotification;
+static CigiIGMsgV4 IGMsg;
 
 static XIGCtrl Pr_IGCtrl;
-static XEntityCtrl Pr_EntityCtrl;
+static XEntityPositionCtrl Pr_EntityPositionCtrl;
 static XConfClampEntityCtrl Pr_ConfClampEntityCtrl;
 static XCompCtrl Pr_CompCtrl;
 static XShortCompCtrl Pr_ShortCompCtrl;
 static XArtPartCtrl Pr_ArtPartCtrl;
 static XShortArtPartCtrl Pr_ShortArtPartCtrl;
-static XRateCtrl Pr_RateCtrl;
+static XVelocityCtrl Pr_VelocityCtrl;
 static XCelestialCtrl Pr_CelestialCtrl;
 static XAtmosCtrl Pr_AtmosCtrl;
 static XEnvRgnCtrl Pr_EnvRgnCtrl;
@@ -159,7 +231,7 @@ static XViewCtrl Pr_ViewCtrl;
 static XSensorCtrl Pr_SensorCtrl;
 static XMotionTrackCtrl Pr_MotionTrackCtrl;
 static XEarthModelDef Pr_EarthModelDef;
-static XTrajectory Pr_Trajectory;
+static XAccelerationCtrl Pr_AccelerationCtrl;
 static XViewDef Pr_ViewDef;
 static XCollDetSegDef Pr_CollDetSegDef;
 static XCollDetVolDef Pr_CollDetVolDef;
@@ -168,16 +240,17 @@ static XLosSegReq Pr_LosSegReq;
 static XLosVectReq Pr_LosVectReq;
 static XPositionReq Pr_PositionReq;
 static XEnvCondReq Pr_EnvCondReq;
-static XSymbolSurfaceDefV3_3 Pr_SymbolSurfaceDef;
-static XSymbolCtrlV3_3 Pr_SymbolCtrl;
-static XShortSymbolCtrlV3_3 Pr_ShortSymbolCtrl;
-static XSymbolTextDefV3_3 Pr_SymbolTextDef;
-static XSymbolCircleDefV3_3 Pr_SymbolCircleDef;
-static XSymbolLineDefV3_3 Pr_SymbolLineDef;
-static XSymbolCloneV3_3 Pr_SymbolClone;
-
-
-
+static XSymbolSurfaceDefV4 Pr_SymbolSurfaceDef;
+static XSymbolCtrlV4 Pr_SymbolCtrl;
+static XShortSymbolCtrlV4 Pr_ShortSymbolCtrl;
+static XSymbolTextDefV4 Pr_SymbolTextDef;
+static XSymbolCircleDefV4 Pr_SymbolCircleDef;
+static XSymbolPolygonDefV4 Pr_SymbolPolygonDef;
+static XSymbolCloneV4 Pr_SymbolClone;
+static XSymbolTexturedCircleDefV4 Pr_SymbolTexturedCircleDefV4;
+static XSymbolTexturedPolygonDefV4 Pr_SymbolTexturedPolygonDefV4;
+static XEntityCtrl Pr_EntityCtrl;
+static XAnimationCtrl Pr_AnimationCtrl;
 
 // CIGI network message buffers and information
 int recvLen;
@@ -197,7 +270,6 @@ static float timeDelayLimit;
 static int Hz;
 
 
-static CigiSOFV3_2 check_SOF;
 
 // ================================================
 // Pre-declaration of Local routines
@@ -210,7 +282,7 @@ void waitUntilBeginningOfFrame(void);
 float timevaldiff( struct timeval *t1, struct timeval *t2 );
 #endif
 
-
+#include <chrono>
 
 // ================================================
 // Main
@@ -230,12 +302,34 @@ int main(int argc, char* argv[])
 
    Omsg.BeginMsg();
 
-
-   while(1)
+   //std::chrono::high_resolution_clock
+#ifdef WIN32
+LARGE_INTEGER timerFreq_;
+LARGE_INTEGER counterAtStart_, counterAtEnd_;
+BOOL perfTimerFlag = QueryPerformanceFrequency(&timerFreq_);
+	if( perfTimerFlag ) { 
+		QueryPerformanceCounter( &counterAtStart_ );  
+		QueryPerformanceCounter( &counterAtEnd_ );  
+	}
+#endif
+   bool running = true;
+   while(running)
    {
-      cout << "================================\n";
-      cout << "Frame: " << Omsg.GetFrameCnt() << endl;
-      cout << "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n";
+#if WIN32
+	   running = !_kbhit();
+#else
+	   running = !_kbhit();
+	   /*initscr();
+		cbreak();
+		noecho();
+		scrollok(stdscr, TRUE);
+		nodelay(stdscr, TRUE);*/
+		//running = (getch() != 'q');
+#endif
+ //     system("cls");
+      //cout << "================================\n";
+      //cout << "Frame: " << Omsg.GetFrameCnt() << endl;
+      //cout << "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n";
 
       /* process incoming CIGI message - this could be long */
       if( CigiInSz > 0 ) {
@@ -247,14 +341,38 @@ int main(int argc, char* argv[])
          }
       }
 
-      cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n\n";
-
-
-      // load the IG Control
-      Omsg << CSOF;
-
-
-
+//      cout << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n\n";
+	static unsigned long frameCounter = 0;
+	 CSOF.SetFrameCntr( frameCounter++ );
+#ifdef WIN32
+	 QueryPerformanceCounter(&counterAtEnd_);
+	 unsigned long eofTimeS = static_cast<unsigned long>((counterAtEnd_.QuadPart - counterAtStart_.QuadPart) * 1000 / timerFreq_.QuadPart);
+	 counterAtStart_ = counterAtEnd_;
+#else
+	 unsigned long eofTimeS = 0;
+#endif
+	 CSOF.SetTimeStamp(eofTimeS);
+     CSOF.SetTimeStampValid( true );
+      // load SOF Control
+		Omsg << CSOF;
+//		Omsg << HatHotResp;
+//		Omsg << HatHotXResp;
+//		Omsg << LosResp;
+//		Omsg << LosXResp;
+//		Omsg << SensorResp;
+//		Omsg << SensorXResp;
+//		Omsg << PositionResp;
+//		Omsg << WeatherCondResp;
+//		Omsg << AerosolResp;
+//		Omsg << MaritimeSurfaceResp;
+//		Omsg << TerrestrialSurfaceResp;
+//		Omsg << CollDetSegResp;
+//		Omsg << CollDetVolResp;
+//		Omsg << AnimationStop;
+//		Omsg << EventNotification;
+//		IGMsg.SetMsg("chas" );
+//		Omsg << IGMsg;
+ 
       // wait until start of frame time
       waitUntilBeginningOfFrame();
 
@@ -269,7 +387,7 @@ int main(int argc, char* argv[])
 
 
       // Update Frame IDs
-      Omsg.UpdateSOF(pCigiOutBuf);
+      Omsg.UpdateSOF(pCigiOutBuf, CInBuf);
 
 
       // send SOF message
@@ -277,27 +395,30 @@ int main(int argc, char* argv[])
 
 
       // Check frame counter
-		check_SOF.Unpack(pCigiOutBuf,false,NULL);
-		cout << check_SOF.GetFrameCntr() << endl;
+		//check_SOF.Unpack(pCigiOutBuf,false,NULL);
+		//cout << check_SOF.GetFrameCntr() << endl;
 
 
       Omsg.FreeMsg();   // Frees the buffer containing the message that was just sent
 
 
       // wait for Host message
-      long HoldTime;
+      time_t HoldTime;
       bool RcvrProc = false;
-      long CheckTime = time(&HoldTime);
+      time_t CheckTime = time(&HoldTime);
       while(!RcvrProc)
       {
          if((CigiInSz = network.recv( CInBuf, RECV_BUFFER_SIZE )) > 0)
             RcvrProc = true;
          else
          {
-            long TstTime = time(&HoldTime);
+            time_t TstTime = time(&HoldTime);
             if((TstTime - CheckTime) > 1)
             {
-               cout << "Did not receive IG Control\n";
+				static unsigned int c = 0;
+               cout << "Did not receive IG Control ";
+			   cout << c++;
+			   cout << "\n";
                RcvrProc = true;
                CigiInSz = 0;
             }
@@ -306,11 +427,10 @@ int main(int argc, char* argv[])
 
    }
 
-
    // shut down the network
    network.closeSocket();
    
-   delete IGSn;
+//   delete IGSn;
    
    return 0;
 }
@@ -346,7 +466,8 @@ void ReadConfig(void)
    Port_H2IG = 8000;
    Port_IG2H = 8001;
    HostAddr = "127.0.0.1";
-  
+   Hz = 60;
+   timeDelayLimit = 0.0167f;
    
    if(stat)
    {
@@ -399,7 +520,7 @@ int init_cigi_if(void){
    
    /* open sockets to CIGI */
    // hostemu-ip-addr, hostemu-socket, local-socket
-   printf("init_cigi_if: initializing ports to CIGI\n");
+   printf("init_cigi_if: initializing  ports to CIGI\n");
    bool netstatus = network.openSocket( 
       HostAddr.c_str(), 
       Port_IG2H,
@@ -421,92 +542,98 @@ int init_cigi_if(void){
    OmsgPtr = &Omsg;
    ImsgPtr = &Imsg;
    
-   IGSn->SetCigiVersion(3,3);
+   IGSn->SetCigiVersion(4,0);
    IGSn->SetSynchronous(true);
    
-   Imsg.SetReaderCigiVersion(3,3);
+   Imsg.SetReaderCigiVersion(4,0);
    Imsg.UsingIteration(false);
    
    // set up a default handler for unhandled packets
-   Imsg.RegisterEventProcessor(0, (CigiBaseEventProcessor *) &DefaultPckt);
+//   Imsg.RegisterEventProcessor(0, (CigiBaseEventProcessor *) &DefaultPckt);
 
    // Register all the Event processors
-   Imsg.RegisterEventProcessor(CIGI_IG_CTRL_PACKET_ID_V3_2,
+   Imsg.RegisterEventProcessor(CIGI_IG_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_IGCtrl);
-   Imsg.RegisterEventProcessor(CIGI_ENTITY_CTRL_PACKET_ID_V3,
-                              (CigiBaseEventProcessor *) &Pr_EntityCtrl);
-   Imsg.RegisterEventProcessor(CIGI_CONF_CLAMP_ENTITY_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_ENTITY_POSITION_CTRL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_EntityPositionCtrl);
+   Imsg.RegisterEventProcessor(CIGI_CONF_CLAMP_ENTITY_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_ConfClampEntityCtrl);
-   Imsg.RegisterEventProcessor(CIGI_COMP_CTRL_PACKET_ID_V3_3,
-                              (CigiBaseEventProcessor *) &Pr_CompCtrl);
-   Imsg.RegisterEventProcessor(CIGI_SHORT_COMP_CTRL_PACKET_ID_V3_3,
+   Imsg.RegisterEventProcessor(CIGI_SHORT_COMP_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_ShortCompCtrl);
-   Imsg.RegisterEventProcessor(CIGI_ART_PART_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_COMP_CTRL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_CompCtrl);
+   Imsg.RegisterEventProcessor(CIGI_ART_PART_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_ArtPartCtrl);
-   Imsg.RegisterEventProcessor(CIGI_SHORT_ART_PART_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_SHORT_ART_PART_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_ShortArtPartCtrl);
-   Imsg.RegisterEventProcessor(CIGI_RATE_CTRL_PACKET_ID_V3_2,
-                              (CigiBaseEventProcessor *) &Pr_RateCtrl);
-   Imsg.RegisterEventProcessor(CIGI_CELESTIAL_CTRL_PACKET_ID_V3,
-                              (CigiBaseEventProcessor *) &Pr_CelestialCtrl);
-   Imsg.RegisterEventProcessor(CIGI_ATMOS_CTRL_PACKET_ID_V3,
-                              (CigiBaseEventProcessor *) &Pr_AtmosCtrl);
-   Imsg.RegisterEventProcessor(CIGI_ENV_RGN_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_VELOCITY_CTRL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_VelocityCtrl);
+   Imsg.RegisterEventProcessor(CIGI_ENV_RGN_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_EnvRgnCtrl);
-   Imsg.RegisterEventProcessor(CIGI_WEATHER_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_CELESTIAL_CTRL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_CelestialCtrl);
+   Imsg.RegisterEventProcessor(CIGI_ATMOS_CTRL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_AtmosCtrl);
+   Imsg.RegisterEventProcessor(CIGI_WEATHER_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_WeatherCtrl);
-   Imsg.RegisterEventProcessor(CIGI_MARITIME_SURFACE_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_MARITIME_SURFACE_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_MaritimeSurfaceCtrl);
-   Imsg.RegisterEventProcessor(CIGI_WAVE_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_WAVE_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_WaveCtrl);
-   Imsg.RegisterEventProcessor(CIGI_TERRESTRIAL_SURFACE_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_TERRESTRIAL_SURFACE_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_TerrestrialSurfaceCtrl);
-   Imsg.RegisterEventProcessor(CIGI_VIEW_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_VIEW_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_ViewCtrl);
-   Imsg.RegisterEventProcessor(CIGI_SENSOR_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_SENSOR_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_SensorCtrl);
-   Imsg.RegisterEventProcessor(CIGI_MOTION_TRACK_CTRL_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_MOTION_TRACK_CTRL_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_MotionTrackCtrl);
-   Imsg.RegisterEventProcessor(CIGI_EARTH_MODEL_DEF_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_EARTH_MODEL_DEF_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_EarthModelDef);
-   Imsg.RegisterEventProcessor(CIGI_TRAJECTORY_DEF_PACKET_ID_V3,
-                              (CigiBaseEventProcessor *) &Pr_Trajectory);
-   Imsg.RegisterEventProcessor(CIGI_VIEW_DEF_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_ACCELERATION_CTRL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_AccelerationCtrl);
+   Imsg.RegisterEventProcessor(CIGI_VIEW_DEF_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_ViewDef);
-   Imsg.RegisterEventProcessor(CIGI_COLL_DET_SEG_DEF_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_COLL_DET_SEG_DEF_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_CollDetSegDef);
-   Imsg.RegisterEventProcessor(CIGI_COLL_DET_VOL_DEF_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_COLL_DET_VOL_DEF_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_CollDetVolDef);
-   Imsg.RegisterEventProcessor(CIGI_HAT_HOT_REQ_PACKET_ID_V3_2,
+   Imsg.RegisterEventProcessor(CIGI_HAT_HOT_REQ_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_HatHotReq);
-   Imsg.RegisterEventProcessor(CIGI_LOS_SEG_REQ_PACKET_ID_V3_2,
+   Imsg.RegisterEventProcessor(CIGI_LOS_SEG_REQ_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_LosSegReq);
-   Imsg.RegisterEventProcessor(CIGI_LOS_VECT_REQ_PACKET_ID_V3_2,
+   Imsg.RegisterEventProcessor(CIGI_LOS_VECT_REQ_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_LosVectReq);
-   Imsg.RegisterEventProcessor(CIGI_POSITION_REQ_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_POSITION_REQ_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_PositionReq);
-   Imsg.RegisterEventProcessor(CIGI_ENV_COND_REQ_PACKET_ID_V3,
+   Imsg.RegisterEventProcessor(CIGI_ENV_COND_REQ_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_EnvCondReq);
-   Imsg.RegisterEventProcessor(CIGI_SYMBOL_SURFACE_DEF_PACKET_ID_V3_3,
+   Imsg.RegisterEventProcessor(CIGI_SYMBOL_SURFACE_DEF_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_SymbolSurfaceDef);
-   Imsg.RegisterEventProcessor(CIGI_SYMBOL_CONTROL_PACKET_ID_V3_3,
-                              (CigiBaseEventProcessor *) &Pr_SymbolCtrl);
-   Imsg.RegisterEventProcessor(CIGI_SHORT_SYMBOL_CONTROL_PACKET_ID_V3_3,
-                              (CigiBaseEventProcessor *) &Pr_ShortSymbolCtrl);
-   Imsg.RegisterEventProcessor(CIGI_SYMBOL_TEXT_DEFINITION_PACKET_ID_V3_3,
+   Imsg.RegisterEventProcessor(CIGI_SYMBOL_TEXT_DEFINITION_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_SymbolTextDef);
-   Imsg.RegisterEventProcessor(CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_ID_V3_3,
+   Imsg.RegisterEventProcessor(CIGI_SYMBOL_CIRCLE_DEFINITION_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_SymbolCircleDef);
-   Imsg.RegisterEventProcessor(CIGI_SYMBOL_LINE_DEFINITION_PACKET_ID_V3_3,
-                              (CigiBaseEventProcessor *) &Pr_SymbolLineDef);
-   Imsg.RegisterEventProcessor(CIGI_SYMBOL_CLONE_PACKET_ID_V3_3,
+   Imsg.RegisterEventProcessor(CIGI_SYMBOL_POLYGON_DEFINITION_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_SymbolPolygonDef);
+   Imsg.RegisterEventProcessor(CIGI_SYMBOL_CLONE_PACKET_ID_V4,
                               (CigiBaseEventProcessor *) &Pr_SymbolClone);
-
-
+   Imsg.RegisterEventProcessor(CIGI_SYMBOL_CONTROL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_SymbolCtrl);
+   Imsg.RegisterEventProcessor(CIGI_SHORT_SYMBOL_CONTROL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_ShortSymbolCtrl);
+   Imsg.RegisterEventProcessor(CIGI_SYMBOL_TEXTURED_CIRCLE_DEFINITION_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_SymbolTexturedCircleDefV4);
+   Imsg.RegisterEventProcessor(CIGI_SYMBOL_TEXTURED_POLYGON_DEFINITION_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_SymbolTexturedPolygonDefV4);
+   Imsg.RegisterEventProcessor(CIGI_ENTITY_CTRL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_EntityCtrl);
+   Imsg.RegisterEventProcessor(CIGI_ANIMATION_CTRL_PACKET_ID_V4,
+                              (CigiBaseEventProcessor *) &Pr_AnimationCtrl);
 
 
    // initialize the SOF
-   CSOF.SetDatabaseID(1);
+   CSOF.SetDatabaseID(0);
    CSOF.SetIGStatus(0);
    CSOF.SetIGMode(CigiBaseSOF::Operate);
    CSOF.SetTimeStampValid(false);
@@ -590,6 +717,7 @@ float timevaldiff( struct timeval *t1, struct timeval *t2 ) {
 }
 
 #endif
+
 
 
 

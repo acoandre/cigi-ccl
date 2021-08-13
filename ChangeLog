@@ -1,3 +1,222 @@
+[06.17.2020]
+Version 4.0.6 - BFolse
+-------------
+CigiOutgoingMsg.cpp Found error when compiling for LINUX
+Changed Line 193
+  std::memset( &attr, 0, sizeof( attr ) );
+To
+  memset( &attr, 0, sizeof( attr ) );
+
+Version 4.0.6 - JDauble
+-------------
+[05.14.2020]
+CigiAccelerationCtrlV4.h, GetArtPartID should be returning a Cigi_uint8 instead of a Cigi_uint16
+cigiSymbolTextDefV4, increase max text size from 235 to 65528
+
+Version 4.0.5 - Chas
+-------------
+Replaced current CigiOutgoingMsg.h with version 4.0.2 CigiOutgoingMsg.h
+File management/repository issue.
+
+Version 4.0.4 - SDevine
+-------------
+[11.04.2019]
+Add code to resolve conflict processing unknown packets and IG Control (packet id: 0 ).
+
+Version 4.0.4 - Chas
+-------------
+[12.19.2019]
+cigibaseweatherctrl.h
+Added Layer ID enumerations
+
+Version 4.0.3 - Chas
+-------------
+[07.25.2019]
+
+XWeatherCtrl.cpp.cpp
+Removed calls to GetTopThickness() and GetBottomThickness()
+
+CigiBaseSignalProcessing.h
+Added OnEntityPositionCtrl
+
+CigiIncomingMsg.cpp
+Added CigiSignalType::SigEntityPositionCtrl and CigiSignalType::SigAnimationCtrl
+to SignalJump()
+
+CigiSession.h
+Moved SessionTypeEnum to Public:
+
+Version 4.0.2 - ECatalano
+-------------
+[05.16.2019]
+
+Changes/Additions:
+------------------
+Resolved member function errors with the following
+CigiBaseSymbolTexturedPolygonDef.cpp
+CigiSymbolTexturedCircleDefV4.cpp
+CigiSymbolTexturedPolygonDefV4.cpp
+
+
+Version 4.0.2 - BFolse
+-------------
+[04.29.2019]
+
+Changes/Additions:
+------------------
+Added a few lines to help enable threading
+CigiOutgoingMsg.cpp
+CigiOutgoingMsg.h
+
+Version 4.0.2 - pmis
+-------------
+[12.17.2018]
+
+Changes/Additions:
+------------------
+Removed all sub-folders from source and include folders (back to the way they were previosuly).
+This was required in order to get the Linux version to build since the Linux Makefile
+is auto generated and is not compatible with sub-folders.
+
+EntityCtrl files
+ - Moved accessors that are not supported in V4 packet out of base class
+
+CigiSOFV4::Unpack
+ - Fixed error in determining if byte swapping is required
+
+CigiIGCtrlV4::Unpack
+ - Added missing byte swap check
+ - Fixed compiler warning
+
+Cigi*V4::Unpack()
+ - Added byte swapping for many of these
+
+CigiTypes_MSVS_Win32.h
+ - Moved from include/Version3 to include
+
+CigiSession::RegisterUserPacket()
+- Switched PacketID from Cigi_uint8 to Cigi_uint16
+
+CigiBasePacket.h
+- Made GetCnvt set ProcID to ProcNone if PacketID is 0. This fixes issue with unset IncomingHandlerTbl and outGoingHandlerTbl entries causing packet to be interpreted as an IGControl packet (0)
+
+CigiEntityCtrlVX.h/.cpp
+CigiBaseEntityCtrl.h/.cpp
+Fixes required to allow correct version conversion:
+- Removed CigiBaseEntityCtrlV3, moved everything into CigiBaseEntityCtrl
+- Moved all member variables from CigiEntityCtrlV4 to base class
+
+CigiBaseArtPartCtrl.h/.cpp
+CigiArtPartCtrlV4.h
+CigiVelocityCtrlV4.h
+- Removed ArtPartIDV4 (must now use ArtPartIDV3 instead) to allow correct version conversion
+- Removed ShortEntityType and EntityCountry (use EntityType for both instead)
+
+CigiBaseCompCtrl.h
+CigiCompCtrlV4.h/.cpp
+CigiShortCompCtrlV4.h/.cpp
+- Removed CompClassV4 (must now use CompClassV3 instead) to allow correct version conversion
+
+CigiBaseIGCtrl.h/.cpp
+CigiIGCtrlV4.h/.cpp
+CigiBaseSOF.h/.cpp
+CigiSOFV4.h/.cpp
+- Removed TimeStampV4 (must now use TimeStampV3 instead) to allow correct version conversion
+
+CigiIGMsgV4.h/.cpp
+- Removed Cigi_int8 Msg[65535] from derived class parameter to allow correct version conversion
+
+- CigiIGMsgV3.cpp
+Fixed bug in unpack introduced in 4.0.0.
+
+CigiIGMsg*.*
+ - Changed Msg member to be STL vector to more efficiently accomodate messages up to 65520 bytes as per CIGI 4 spec
+
+CigiIncomingMsg::RegisterUserPacket
+CigiOutgoingMsg::RegisterUserPacket
+- Fixed issue carried over from 3.3.3 in these two files that was causing any call to 
+  CigiIGSession::RegisterUserPacket() to return error if the packet is not going to be 
+  processed due to HostSend or IGSend. Changed this to instead just silently do nothing 
+  and return no error.
+
+CigiIncomingMsg.cpp
+- Moved byte swap determination into CheckFirstPacket() as we need to know if byte swap 
+  is required in order to read PacketSize and Packet ID of the first  packet when receiving Cigi4
+- Added byte swap of PacketSize and PacketID
+- Fixed GetFirstPacket() and GetNextPacket() to work with Cigi4
+
+CigiCompCtrlV3::GetCnvt
+CigiHatHotReqV3::GetCnvt
+CigiHatHotRespV3::GetCnvt
+CigiHatHotXRespV3::GetCnvt
+CigiLosRespV3::GetCnvt
+CigiLosXRespV3::GetCnvt
+CigiSensorXRespV3::GetCnvt
+CigiShortCompCtrlV3::GetCnvt
+CigiCompCtrlV2::GetCnvt
+CigiHatReqV2::GetCnvt
+CigiHatRespV2::GetCnvt
+CigiHotReqV2::GetCnvt
+CigiHotRespV2::GetCnvt
+CigiLosRespV2::GetCnvt
+CigiHatHotReqV3_2::GetCnvt
+CigiHatHotRespV3_2::GetCnvt
+CigiHatHotXRespV3_2::GetCnvt
+CigiLosRespV3_2::GetCnvt
+CigiLosXRespV3_2::GetCnvt
+CigiCompCtrlV1::GetCnvt
+CigiHatReqV1::GetCnvt
+CigiHatRespV1::GetCnvt
+CigiLosRespV1::GetCnvt
+- Added Cigi4 conversion
+
+CigiShortComCtrlV3/V3_3/V4.h
+
+In Cigi 2.0 the Component State field of a short component control was 16 bits. In CIGI 3.0 this was
+truncated to an 8 bit field in the packet but still maintained as 16 bit in memory. So reading old
+Cigi2.0 logs that contained component state values greater than 255 still worked.
+
+In the Cigi 3.3 CCL library the call to GetComponentState was changed to return an 8 bit value which
+breaks the ability to convert incomming V2.0 data since values greater than 255 were set to 255.
+
+To fix this changed the call back to returning a 16 bit value.
+
+
+TrajectoryDef->AccelerationCtrl
+RateCtrl->VelocityCtrl
+SymbolLineDef->SymbolPolygonDef
+
+These three packet name changes broke the conversion of Cigi < 4 packets if the reader is Cgig4. 
+e.g. CigiBaseTrajectoryDef::GetCnvt() function was setting the converted packet ID to CIGI_TRAJECTORY_DEF_PACKET_ID_V3 which ends up making the reader process the wrong type of packet.
+To fix:
+-Removed the three respective Base types of the new packets.
+-Switched the new V4 packets be derived from the old base packets.
+-Modified GetCnvt to choose appropriate packet type.
+
+
+Version 4.0.1 - cjw
+-------------
+[12.29.2016]
+
+Changes/Additions:
+------------------
+- Bug fixes.
+- x86 and x64
+- vc10
+- ported all code (test tools) in Testing folder, updated .csv files
+
+Version 4.0.0 - cjw
+-------------
+[07.29.2015]
+
+Changes/Additions:
+------------------
+- Initial port to 4.0.0 spec
+- vc9
+- static and dynamic builds
+- backwards compatible down to 1.x
+- no longer required to compile all cigi versions
+
 Version 3.3.3
 -------------
 [02.02.2012]

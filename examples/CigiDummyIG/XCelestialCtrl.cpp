@@ -23,12 +23,13 @@ XCelestialCtrl::~XCelestialCtrl()
 
 void XCelestialCtrl::OnPacketReceived(CigiBasePacket *Packet)
 {
-   CigiCelestialCtrlV3 *InPckt = (CigiCelestialCtrlV3 *)Packet;
+   CigiCelestialCtrlV4 *InPckt = (CigiCelestialCtrlV4 *)Packet;
 
-   printf("===> CelestialCtrl <===\n");
+   printf("===> CigiCelestialCtrlV4 <===\n");
 
    printf("Hour ==> %d\n",InPckt->GetHour());
    printf("Minute ==> %d\n",InPckt->GetMinute());
+   printf("Seconds ==> %.5f\n",InPckt->GetSeconds());
    printf("EphemerisEn ==> %d\n",InPckt->GetEphemerisEn());
    printf("SunEn ==> %d\n",InPckt->GetSunEn());
    printf("MoonEn ==> %d\n",InPckt->GetMoonEn());

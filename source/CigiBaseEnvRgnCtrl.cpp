@@ -89,10 +89,15 @@ int CigiBaseEnvRgnCtrl::GetCnvt(CigiVersionID &CnvtVersion,
       CnvtInfo.ProcID = CigiProcessType::ProcNone;
       CnvtInfo.CnvtPacketID = 0;
    }
-   else
+   else if(CnvtVersion.CigiMajorVersion < 4)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcStd;
       CnvtInfo.CnvtPacketID = CIGI_ENV_RGN_CTRL_PACKET_ID_V3;
+   }
+   else
+   {
+      CnvtInfo.ProcID = CigiProcessType::ProcStd;
+      CnvtInfo.CnvtPacketID = CIGI_ENV_RGN_CTRL_PACKET_ID_V4;
    }
 
    return(CIGI_SUCCESS);

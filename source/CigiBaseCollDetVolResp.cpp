@@ -89,7 +89,7 @@ int CigiBaseCollDetVolResp::GetCnvt(CigiVersionID &CnvtVersion,
       CnvtInfo.ProcID = CigiProcessType::ProcNone;
       CnvtInfo.CnvtPacketID = 0;
    }
-   else
+   else if(CnvtVersion.CigiMajorVersion < 4)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcStd;
 
@@ -97,6 +97,11 @@ int CigiBaseCollDetVolResp::GetCnvt(CigiVersionID &CnvtVersion,
          CnvtInfo.CnvtPacketID = CIGI_COLL_DET_VOL_RESP_PACKET_ID_V2;
       else
          CnvtInfo.CnvtPacketID = CIGI_COLL_DET_VOL_RESP_PACKET_ID_V3;
+   }
+   else 
+   {
+      CnvtInfo.ProcID = CigiProcessType::ProcStd;
+      CnvtInfo.CnvtPacketID = CIGI_COLL_DET_VOL_RESP_PACKET_ID_V4;
    }
 
    return(CIGI_SUCCESS);

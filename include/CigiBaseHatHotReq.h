@@ -50,6 +50,8 @@
  *  11/20/2007 Greg Basler                       Version 2.0.0
  *  Moved Packet information to base packet.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *
  * </pre>
  *  Author: The Boeing Company
  *
@@ -80,6 +82,9 @@
 #define CIGI_HAT_HOT_REQ_PACKET_ID_V3_2 24
 #define CIGI_HAT_HOT_REQ_PACKET_SIZE_V3_2 32
 
+#define CIGI_HAT_HOT_REQ_PACKET_ID_V4 0x17
+#define CIGI_HAT_HOT_REQ_PACKET_SIZE_V4 40
+
 
 
 class CigiHatReqV1;
@@ -87,6 +92,7 @@ class CigiHatReqV2;
 class CigiHotReqV2;
 class CigiHatHotReqV3;
 class CigiHatHotReqV3_2;
+class CigiHatHotReqV4;
 
 
 class CIGI_SPEC CigiBaseHatHotReq : public CigiBasePacket
@@ -97,6 +103,7 @@ friend class CigiHatReqV2;
 friend class CigiHotReqV2;
 friend class CigiHatHotReqV3;
 friend class CigiHatHotReqV3_2;
+friend class CigiHatHotReqV4;
 
 public:
 

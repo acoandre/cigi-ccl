@@ -31,6 +31,12 @@
  *  03/11/2008 Greg Basler                       CIGI_SYM_1
  *  Initial Release.
  *  
+ *  07/29/2015 Chas Whitley                      Version 4.0.0
+ *  
+ *  04/14/2021 Paul Slade			 Version 4.0.6b
+ *  Fixed constructor/copy constructor to properly
+ *  manage FontId and MaxcharCnt
+ *  
  * </pre>
  *  Author: The Boeing Company
  *
@@ -54,6 +60,7 @@ using namespace std;
 // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 CigiBaseSymbolTextDef::CigiBaseSymbolTextDef(void)
 {
+	MaxCharCnt = 235;
 }
 
 // ================================================
@@ -73,8 +80,10 @@ CigiBaseSymbolTextDef::CigiBaseSymbolTextDef(const CigiBaseSymbolTextDef &BaseIn
    Alignment = BaseIn.Alignment;
    Orientation = BaseIn.Orientation;
    FontSize = BaseIn.FontSize;
+   FontID = BaseIn.FontID;
    VariableDataSize = BaseIn.VariableDataSize;
    Text = BaseIn.Text;
+   MaxCharCnt = BaseIn.MaxCharCnt;
 }
 
 // ================================================
@@ -86,8 +95,10 @@ CigiBaseSymbolTextDef & CigiBaseSymbolTextDef::operator=(const CigiBaseSymbolTex
    Alignment = BaseIn.Alignment;
    Orientation = BaseIn.Orientation;
    FontSize = BaseIn.FontSize;
+   FontID = BaseIn.FontID;
    VariableDataSize = BaseIn.VariableDataSize;
    Text = BaseIn.Text;
+   MaxCharCnt = BaseIn.MaxCharCnt;
 
    return(*this);
 }
@@ -99,15 +110,20 @@ CigiBaseSymbolTextDef & CigiBaseSymbolTextDef::operator=(const CigiBaseSymbolTex
 int CigiBaseSymbolTextDef::GetCnvt(CigiVersionID &CnvtVersion,
                                 CigiCnvtInfoType::Type &CnvtInfo)
 {
-   if(CnvtVersion.GetCombinedCigiVersion() < 0x303)
+   if(CnvtVersion.CigiMajorVersion < 3)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcNone;
       CnvtInfo.CnvtPacketID = 0;
    }
-   else
+   else if(CnvtVersion.CigiMajorVersion < 4)
    {
       CnvtInfo.ProcID = CigiProcessType::ProcStd;
       CnvtInfo.CnvtPacketID = CIGI_SYMBOL_TEXT_DEFINITION_PACKET_ID_V3_3;
+   }
+   else
+   {
+      CnvtInfo.ProcID = CigiProcessType::ProcStd;
+      CnvtInfo.CnvtPacketID = CIGI_SYMBOL_TEXT_DEFINITION_PACKET_ID_V4;
    }
 
    return(CIGI_SUCCESS);
@@ -191,7 +207,7 @@ int CigiBaseSymbolTextDef::SetFontSize(const float FontSizeIn, bool bndchk)
 int CigiBaseSymbolTextDef::SetText(const std::string &TextIn, bool bndchk)
 {
 
-   int TxtSz = TextIn.size();
+   int TxtSz = (int)TextIn.size();
 
 #ifndef CIGI_NO_BND_CHK
    if(bndchk && ((TxtSz < 0)||(TxtSz > MaxCharCnt)))

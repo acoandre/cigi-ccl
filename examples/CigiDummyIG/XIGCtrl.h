@@ -6,7 +6,7 @@
 #define _PROC_XIGCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiIGCtrlV3_3.h"
+#include "CigiIGCtrlV4.h"
 
 class XIGCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiIGCtrlV3_3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiIGCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiIGCtrlV3_3 *TPckt;
+   CigiIGCtrlV4 *TPckt;
 
 };
 

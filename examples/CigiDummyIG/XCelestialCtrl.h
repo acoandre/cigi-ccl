@@ -6,7 +6,7 @@
 #define _PROC_XCelestialCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiCelestialCtrl.h"
+#include "CigiCelestialCtrlV4.h"
 
 class XCelestialCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiCelestialCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiCelestialCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiCelestialCtrlV3 *TPckt;
+   CigiCelestialCtrlV4 *TPckt;
 
 };
 

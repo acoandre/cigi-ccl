@@ -6,7 +6,7 @@
 #define _PROC_XWaveCtrl_INCLUDED_
 
 #include "CigiBaseEventProcessor.h"
-#include "CigiWaveCtrlV3.h"
+#include "CigiWaveCtrlV4.h"
 
 class XWaveCtrl : public CigiBaseEventProcessor
 {
@@ -16,10 +16,10 @@ public:
 
    virtual void OnPacketReceived(CigiBasePacket *Packet);
 
-   void SetOrigPckt(CigiWaveCtrlV3 *TPcktIn) { TPckt = TPcktIn; }
+   void SetOrigPckt(CigiWaveCtrlV4 *TPcktIn) { TPckt = TPcktIn; }
 
 protected:
-   CigiWaveCtrlV3 *TPckt;
+   CigiWaveCtrlV4 *TPckt;
 
 };
 

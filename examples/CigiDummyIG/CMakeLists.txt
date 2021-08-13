@@ -1,0 +1,21 @@
+set(PROJECT_NAME CIGIDummyIG)
+project(${PROJECT_NAME})
+
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
+#gather source files
+file(GLOB PKG_SRC "*.cpp")
+file(GLOB PKG_INC "*.h*")
+include_directories(${CMAKE_SOURCE_DIR}/Examples/TinyXML)
+add_executable(${PROJECT_NAME} ${PKG_SRC} ${PKG_INC})
+if(MSVC OR MINGW)
+	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS /SUBSYSTEM:CONSOLE)
+endif()
+target_link_libraries(${PROJECT_NAME} tinyxml cigicl-static)
+if (WIN32)
+target_link_libraries(${PROJECT_NAME} wsock32)
+elseif(UNIX)
+target_link_libraries(${PROJECT_NAME} pthread)
+endif(WIN32)
